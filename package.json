@@ -1,0 +1,116 @@
+{
+  "name": "paolium-pomodoro",
+  "displayName": "Paolium Pomodoro",
+  "publisher": "Paolium",
+  "author": "Paolium",
+  "version": "1.0.0",
+  "description": "A beautiful and an elegant Pomodoro timer",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#007A5E",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "extensionKind": ["ui"],
+  "categories": [ "Other" ],
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "focus",
+    "productivity",
+    "ambient"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Paolium/vscode-paolium-pomodoro/"
+  },
+  "bugs": {
+    "url": "https://github.com/Paolium/vscode-paolium-pomodoro/issues"
+  },
+  "homepage": "https://github.com/Paolium/",
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "paolium-pomodoro-focus.open",
+        "title": "Open Pomodoro Timer",
+        "category": "Pomodoro"
+      },
+      {
+        "command": "paolium-pomodoro-focus.close",
+        "title": "Close Pomodoro Timer",
+        "category": "Pomodoro"
+      }
+    ],
+    "configuration": {
+      "title": "Paolium Pomodoro Focus",
+      "properties": {
+        "pomodoro.focusDuration": {
+          "type": "number",
+          "default": 25,
+          "minimum": 1,
+          "maximum": 60,
+          "description": "Focus duration in minutes"
+        },
+        "pomodoro.breakDuration": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "Break duration in minutes"
+        },
+        "pomodoro.roundsPerSession": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 12,
+          "description": "Number of rounds per session (1 round = 1 Focus + 1 Break)"
+        },
+        "pomodoro.autoStartBreaks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start break timer after focus"
+        },
+        "pomodoro.autoStartFocus": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically start focus timer after break"
+        },
+        "pomodoro.backgroundImage": {
+          "type": "string",
+          "default": "transparent",
+          "enum": [
+            "transparent",
+            "paolium",
+            "sapphire",
+            "ruby",
+            "light",
+            "graphite",
+            "carbon",
+            "amethyst"
+          ],
+          "description": "Background theme (from vscode-paolium-theme)"
+        },
+        "pomodoro.enableSounds": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play sound alerts on focus start, break start, and session complete"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}
