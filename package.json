@@ -3,10 +3,10 @@
   "displayName": "Paolium Pomodoro",
   "publisher": "Paolium",
   "author": "Paolium",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A beautiful and an elegant Pomodoro timer",
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "paolium-icon.png",
   "galleryBanner": {
     "color": "#007A5E",
     "theme": "dark"
