@@ -150,9 +150,6 @@ export class Timer {
 		this.allComplete = false;
 		this.currentRound = 1;
 		this.elapsedSeconds = 0;
-		this.storage.sessionTitle = '';
-		this.storage.sessionTag = 'Work';
-		this.storage.notes = '';
 		this.resetToPhase('focus');
 		this.emitTick();
 	}
@@ -161,6 +158,15 @@ export class Timer {
 		if (this.allComplete || this.status === 'idle') return;
 		this.clearAutoStartTimeout();
 		this.handlePhaseComplete();
+	}
+
+	/** Ends the session immediately, regardless of remaining rounds, and records it as complete. */
+	stop(): void {
+		if (this.allComplete) return;
+		this.clearInterval();
+		this.clearAutoStartTimeout();
+		this.completeSession();
+		this.emitTick();
 	}
 
 	setSessionTitle(title: string): void {

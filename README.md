@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-![Paolium Pomodoro](https://github.com/Paolium/.github/blob/main/logos/paolium-logo-x-tools.png?raw=true)
+![Paolium Pomodoro](https://github.com/Paolium/.github/blob/main/logos/paolium-logo-large-tools.png?raw=true)
 
 A beautiful and an elegant Pomodoro timer.
 

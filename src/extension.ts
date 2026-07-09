@@ -154,6 +154,7 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 		case 'pause': timer.pause(); break;
 		case 'reset': timer.reset(); break;
 		case 'skip': timer.skip(); break;
+		case 'stop': timer.stop(); break;
 		case 'setTitle': timer.setSessionTitle(message.title as string); break;
 		case 'setTag': timer.setSessionTag(message.tag as string); break;
 		case 'setNotes':

@@ -245,6 +245,10 @@ body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
 .session-info[data-activetag="fitness"] * { color: #7cb518; }
 .session-info.complete { color: #34c759; font-weight: 700; }
 
+.app.dark .session-info.phase-break,
+.session-info.phase-break,
+.session-info.phase-break * { color: #007A5E; }
+
 .controls { display: flex; gap: 16px; justify-content: center; align-items: center; }
 .btn { border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s ease; }
 .btn-secondary { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.55); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
@@ -412,6 +416,9 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 				</button>
 				<button class="btn btn-secondary" id="skipBtn" title="Skip">
 					<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+				</button>
+				<button class="btn btn-secondary" id="stopBtn" title="Stop session">
+					<svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
 				</button>
 			</div>
 		</div>
@@ -623,6 +630,10 @@ $('resetBtn').addEventListener('click', () => {
 
 $('skipBtn').addEventListener('click', () => {
 	vscodeApi.postMessage({ type: 'skip' });
+});
+
+$('stopBtn').addEventListener('click', () => {
+	vscodeApi.postMessage({ type: 'stop' });
 });
 
 // ============================================================
@@ -872,12 +883,13 @@ function renderSessionInfo(isTimerActive) {
 	sessionInfo.classList.remove('complete');
 	if (isTimerActive) {
 		sessionInfo.classList.add('running');
+		sessionInfo.classList.toggle('phase-break', state.phase === 'break');
 		const tagLabel = state.sessionTag || 'Focus';
 		const phaseTag = state.phase === 'focus' ? 'Focus' : 'Break';
 		sessionInfo.dataset.activetag = (state.sessionTag || 'work').toLowerCase();
 		sessionInfo.innerHTML = `${tagLabel} - <span class="phase-tag ${state.phase}">${phaseTag}</span> ${state.currentRound}/${state.roundsPerSession}`;
 	} else {
-		sessionInfo.classList.remove('running');
+		sessionInfo.classList.remove('running', 'phase-break');
 		delete sessionInfo.dataset.activetag;
 		sessionInfo.textContent = `Rounds ${state.currentRound}/${state.roundsPerSession}`;
 	}
