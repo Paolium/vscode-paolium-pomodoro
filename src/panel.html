@@ -326,19 +326,38 @@ body:has(.app.dark) .notes-trash-btn:hover svg { fill: #ff5e72; }
 
 .sticky-note {
 	position: relative; border-radius: 12px; padding: 12px 12px 10px;
-	border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease;
+	border: 1px solid transparent;
 	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.sticky-note:hover { transform: scale(1.015); box-shadow: 0 4px 14px rgba(0,0,0,0.12); z-index: 1; }
 
-.sticky-note.color-0 { background: rgba(255, 209, 102, 0.22); border-color: rgba(255, 190, 60, 0.35); }
-.sticky-note.color-1 { background: rgba(255, 138, 178, 0.18); border-color: rgba(255, 118, 164, 0.32); }
-.sticky-note.color-2 { background: rgba(108, 178, 255, 0.18); border-color: rgba(90, 160, 255, 0.32); }
-.sticky-note.color-3 { background: rgba(120, 224, 143, 0.20); border-color: rgba(95, 205, 120, 0.32); }
-.sticky-note.color-4 { background: rgba(190, 149, 255, 0.20); border-color: rgba(175, 130, 255, 0.34); }
+.sticky-note-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+.sticky-note-color-wrap { position: relative; }
+.sticky-note-color-btn {
+	width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; padding: 0;
+	display: block; transition: transform 0.12s ease;
+}
+.sticky-note-color-btn:hover { transform: scale(1.1); }
+body:has(.app.dark) .sticky-note-color-btn { border-color: rgba(255,255,255,0.4); }
+
+.note-color-menu {
+	position: absolute; top: 24px; left: 0; z-index: 5; display: none; gap: 6px;
+	background: #f4f4f6; padding: 7px; border-radius: 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+.note-color-menu.open { display: flex; }
+body:has(.app.dark) .note-color-menu { background: #202024; box-shadow: 0 6px 18px rgba(0,0,0,0.4); }
+
+.palette-swatch {
+	width: 16px; height: 16px; border-radius: 50%; border: none; cursor: pointer; padding: 0;
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.15); transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.palette-swatch:hover { transform: scale(1.15); }
+.palette-swatch.active { box-shadow: 0 0 0 2px rgba(255,255,255,0.9), 0 0 0 3px rgba(0,0,0,0.35); }
+body:has(.app.dark) .palette-swatch { box-shadow: 0 0 0 1px rgba(255,255,255,0.25); }
+body:has(.app.dark) .palette-swatch.active { box-shadow: 0 0 0 2px rgba(20,20,24,0.9), 0 0 0 3px rgba(255,255,255,0.7); }
 
 .sticky-note-del {
-	position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%;
+	width: 20px; height: 20px; border-radius: 50%;
 	background: rgba(0,0,0,0.08); border: none; cursor: pointer; display: flex; align-items: center;
 	justify-content: center; font-size: 13px; line-height: 1; color: rgba(0,0,0,0.45); transition: background 0.15s ease;
 }
@@ -349,7 +368,7 @@ body:has(.app.dark) .sticky-note-del:hover { background: rgba(255,94,114,0.3); c
 .sticky-note-text {
 	width: 100%; background: transparent; border: none; outline: none; resize: none;
 	font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.45; color: #1d1d1f;
-	padding-right: 18px; min-height: 44px; overflow: hidden;
+	min-height: 44px; overflow: hidden;
 }
 .sticky-note-text::placeholder { color: rgba(0,0,0,0.35); }
 body:has(.app.dark) .sticky-note-text { color: #f5f5f7; }
@@ -1124,10 +1143,29 @@ function renderResume() {
 // ============================================================
 const noteSaveTimers = {};
 
+// Base theme colors, reused as the note color palette.
+const NOTE_PALETTE = ['#F7C359', '#FA4F67', '#0D71FD', '#7CB518', '#7A5AF8', '#007A5E'];
+
+function hexToRgb(hex) {
+	const n = parseInt(hex.slice(1), 16);
+	return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+}
+
+function noteColorRule(hex) {
+	const rgb = hexToRgb(hex);
+	return `background: rgba(${rgb},0.20); border-color: rgba(${rgb},0.38);`;
+}
+
 function autoGrow(textarea) {
 	textarea.style.height = 'auto';
 	textarea.style.height = textarea.scrollHeight + 'px';
 }
+
+function closeAllNoteColorMenus() {
+	document.querySelectorAll('.note-color-menu.open').forEach(m => m.classList.remove('open'));
+}
+
+document.addEventListener('click', closeAllNoteColorMenus);
 
 function renderStickyNotes() {
 	const list = $('stickyNotesList');
@@ -1141,9 +1179,19 @@ function renderStickyNotes() {
 	}
 
 	stickyNotes.forEach((note, index) => {
+		const color = note.color || NOTE_PALETTE[index % NOTE_PALETTE.length];
+		const swatches = NOTE_PALETTE.map(c => `
+			<button class="palette-swatch${c === color ? ' active' : ''}" style="background:${c}" data-id="${note.id}" data-color="${c}" title="Change color"></button>
+		`).join('');
 		html += `
-			<div class="sticky-note color-${index % 5}">
-				<button class="sticky-note-del" data-id="${note.id}" title="Delete note">&times;</button>
+			<div class="sticky-note" data-id="${note.id}" style="${noteColorRule(color)}">
+				<div class="sticky-note-toolbar">
+					<div class="sticky-note-color-wrap">
+						<button class="sticky-note-color-btn" style="background:${color}" data-id="${note.id}" title="Change color"></button>
+						<div class="note-color-menu" data-id="${note.id}">${swatches}</div>
+					</div>
+					<button class="sticky-note-del" data-id="${note.id}" title="Delete note">&times;</button>
+				</div>
 				<textarea class="sticky-note-text" data-id="${note.id}" placeholder="Write a note...">${escapeHtml(note.text)}</textarea>
 			</div>
 		`;
@@ -1171,6 +1219,38 @@ function renderStickyNotes() {
 	list.querySelectorAll('.sticky-note-del').forEach(btn => {
 		btn.addEventListener('click', () => {
 			vscodeApi.postMessage({ type: 'deleteNote', id: btn.dataset.id });
+		});
+	});
+
+	list.querySelectorAll('.sticky-note-color-btn').forEach(btn => {
+		btn.addEventListener('click', e => {
+			e.stopPropagation();
+			const menu = btn.nextElementSibling;
+			const wasOpen = menu.classList.contains('open');
+			closeAllNoteColorMenus();
+			if (!wasOpen) menu.classList.add('open');
+		});
+	});
+
+	list.querySelectorAll('.palette-swatch').forEach(btn => {
+		btn.addEventListener('click', e => {
+			e.stopPropagation();
+			const id = btn.dataset.id;
+			const color = btn.dataset.color;
+			const note = stickyNotes.find(n => n.id === id);
+			if (note) note.color = color;
+
+			const card = list.querySelector(`.sticky-note[data-id="${id}"]`);
+			if (card) {
+				card.setAttribute('style', noteColorRule(color));
+				card.querySelector('.sticky-note-color-btn').style.background = color;
+				card.querySelectorAll('.palette-swatch').forEach(sw => {
+					sw.classList.toggle('active', sw.dataset.color === color);
+				});
+			}
+
+			closeAllNoteColorMenus();
+			vscodeApi.postMessage({ type: 'updateNoteColor', id, color });
 		});
 	});
 

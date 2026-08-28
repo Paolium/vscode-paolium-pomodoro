@@ -30,6 +30,7 @@ export interface SessionRecord {
 export interface StickyNote {
 	id: string;
 	text: string;
+	color?: string;
 }
 
 /**
@@ -159,6 +160,17 @@ export class Storage {
 	}
 
 	/**
+	 * Updates the color of a sticky note by ID
+	 */
+	async updateNoteColor(id: string, color: string): Promise<void> {
+		const notes = this.getNotes();
+		const note = notes.find(n => n.id === id);
+		if (!note) return;
+		note.color = color;
+		await this.context.globalState.update(NOTES_KEY, notes);
+	}
+
+	/**
 	 * Removes a sticky note by ID. Blank notes are deleted permanently; notes with
 	 * content are moved to the trash instead. Returns the updated notes and trash lists.
 	 */
@@ -201,7 +213,7 @@ export class Storage {
 		await this.context.globalState.update(TRASH_KEY, trash);
 
 		const notes = this.getNotes();
-		notes.push({ id: restored.id, text: restored.text });
+		notes.push({ id: restored.id, text: restored.text, color: restored.color });
 		await this.context.globalState.update(NOTES_KEY, notes);
 
 		return { notes, trash };

@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0
+### Added
+- Color picker for sticky notes, using the app's own theme colors as the palette
+
 ## v2.0.0
 ### Added
 - Persistent sticky notes panel, always visible alongside the timer, independent of any session (up to 20 notes, autosaved as you type)

@@ -198,6 +198,11 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 				vscode.window.showErrorMessage(`Failed to save note: ${err.message}`);
 			});
 			break;
+		case 'updateNoteColor':
+			storage.updateNoteColor(message.id as string, message.color as string).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to save note color: ${err.message}`);
+			});
+			break;
 		case 'deleteNote':
 			storage.deleteNote(message.id as string).then(({ notes, trash }) => {
 				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash });
