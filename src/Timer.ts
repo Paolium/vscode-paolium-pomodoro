@@ -21,7 +21,6 @@ export interface TimerStateExt {
 	roundsPerSession: number;
 	sessionTitle: string;
 	sessionTag: string;
-	notes: string;
 	allComplete: boolean;
 	elapsedSeconds: number;
 }
@@ -121,7 +120,6 @@ export class Timer {
 			roundsPerSession: this.config.roundsPerSession,
 			sessionTitle: this.storage.sessionTitle,
 			sessionTag: this.storage.sessionTag,
-			notes: this.storage.notes,
 			allComplete: this.allComplete,
 			elapsedSeconds: this.elapsedSeconds
 		};
@@ -176,11 +174,6 @@ export class Timer {
 
 	setSessionTag(tag: string): void {
 		this.storage.sessionTag = tag;
-		this.emitTick();
-	}
-
-	setNotes(notes: string): void {
-		this.storage.notes = notes;
 		this.emitTick();
 	}
 

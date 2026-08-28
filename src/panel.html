@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paolium Pomodoro</title>
+<title>Pomodoro</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=MuseoModerno:wght@400;500;600;700&display=swap');
 
@@ -11,12 +11,13 @@
 
 body {
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-	min-height: 100vh; overflow: hidden; color: #1d1d1f;
+	min-height: 100vh; height: 100vh; overflow: hidden; color: #1d1d1f;
 	-webkit-font-smoothing: antialiased;
+	display: flex; flex-direction: row; align-items: stretch;
 }
 
-.app, body {
- 	min-height: 100vh;  position: relative; display: flex; flex-direction: column;
+.app {
+ 	min-height: 100vh; flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column;
  	background: transparent;
  	transition: color 0.3s ease;
  	image-rendering: -webkit-optimize-contrast;
@@ -31,17 +32,12 @@ body {
  .app.theme-graphite, body.theme-graphite { --accent:#F7C359; --accent-2:#FFD980; --accent-rgb:247,195,89; }
  .app.theme-carbon,   body.theme-carbon   { --accent:#7CB518; --accent-2:#9ED13A; --accent-rgb:124,181,24; }
  .app.theme-amethyst, body.theme-amethyst { --accent:#7A5AF8; --accent-2:#9A7AFF; --accent-rgb:122,90,248; }
-.app:not(.transparent) {
- 	backdrop-filter: blur(40px) saturate(160%);
- 	-webkit-backdrop-filter: blur(40px) saturate(160%);
- }
-
 /* Dark theme adjustments */
 .app.dark { color: #f5f5f7; }
-.app.dark .timer-card { background: rgba(40,40,48,0.55); border-color: rgba(255,255,255,0.12); box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
+.app.dark .timer-card { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
 .app.dark .timer-display { color: #f5f5f7; }
-.app.dark .session-title-input, .app.dark .notes-input { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #f5f5f7; }
-.app.dark .session-title-input::placeholder, .app.dark .notes-input::placeholder { color: rgba(255,255,255,0.4); }
+.app.dark .session-title-input { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #f5f5f7; }
+.app.dark .session-title-input::placeholder { color: rgba(255,255,255,0.4); }
 .app.dark .btn-secondary { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.18); }
 .app.dark .btn-secondary svg { fill: rgba(255,255,255,0.85); }
 .app.dark .logo { color: rgba(255,255,255,0.7); }
@@ -52,49 +48,8 @@ body {
 .app.dark .tag:not(.active) { background: rgba(15,15,20,0.55); border-color: rgba(255,255,255,0.06); }
 .app.dark .icon-btn { background: rgba(255,255,255,0.12); }
 .app.dark .icon-btn svg { fill: rgba(255,255,255,0.8); }
-.app.dark ~ .side-panel,
-.app.dark + .overlay + .side-panel,
-body:has(.app.dark) .side-panel {
-	background: rgba(18,18,24,0.92);
-	border-left-color: rgba(255,255,255,0.08);
-	color: #f5f5f7;
-	backdrop-filter: blur(40px) saturate(180%);
-	-webkit-backdrop-filter: blur(40px) saturate(180%);
-}
-body:has(.app.dark) .panel-header {
-	background: rgba(18,18,24,0.85);
-	border-bottom-color: rgba(255,255,255,0.08);
-	backdrop-filter: blur(20px);
-}
-body:has(.app.dark) .panel-title { color: #f5f5f7; }
-body:has(.app.dark) .close-btn { background: rgba(255,255,255,0.10); }
-body:has(.app.dark) .close-btn:hover { background: rgba(255,255,255,0.18); }
-body:has(.app.dark) .close-btn svg { fill: rgba(255,255,255,0.7); }
-body:has(.app.dark) .config-section-title { color: rgba(255,255,255,0.45); }
-body:has(.app.dark) .config-row { border-bottom-color: rgba(255,255,255,0.06); }
-body:has(.app.dark) .config-label { color: #f5f5f7; }
-body:has(.app.dark) .config-input {
-	background: rgba(255,255,255,0.08);
-	border-color: rgba(255,255,255,0.15);
-	color: #f5f5f7;
-}
-body:has(.app.dark) .toggle:not(.active) {
-	background: rgba(255,255,255,0.18);
-	box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-}
-body:has(.app.dark) .toggle.active {
-	background: var(--accent, #7b8cff);
-	box-shadow: none;
-}
-body:has(.app.dark) .session-card {
-	background: rgba(255,255,255,0.06);
-	border-color: rgba(255,255,255,0.08);
-}
-body:has(.app.dark) .session-card-title { color: #f5f5f7; }
-body:has(.app.dark) .session-meta { color: rgba(255,255,255,0.55); }
-body:has(.app.dark) .session-notes { color: rgba(255,255,255,0.55); }
-body:has(.app.dark) .history-empty { color: rgba(255,255,255,0.4); }
-body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
+/* Side panels (History/Settings/Time-by-Day/Trash) are always solid carbon-black,
+   regardless of the selected app background theme. */
 
 /* ============================================================
    Background Themes (from vscode-paolium-theme)
@@ -123,7 +78,7 @@ body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
 .header { padding: 16px 26px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
 .logo { font-size: 16px; font-weight: 600; color: rgba(0,0,0,0.55); }
 .signature {
-  position: fixed;
+  position: absolute;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
@@ -143,20 +98,18 @@ body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
 .header-actions { display: flex; gap: 10px; }
 .icon-btn {
 	width: 38px; height: 38px; border-radius: 50%;
-	background: rgba(255,255,255,0.5); backdrop-filter: blur(10px);
+	background: rgba(255,255,255,0.75);
 	border: 1px solid rgba(0,0,0,0.06); cursor: pointer;
 	display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
 }
-.icon-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.05); }
+.icon-btn:hover { background: rgba(255,255,255,0.95); transform: scale(1.05); }
 .icon-btn svg { width: 19px; height: 19px; fill: rgba(0,0,0,0.55); }
 
 .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 1; }
 
 .timer-card {
-	background: rgba(255,255,255,0.5); backdrop-filter: blur(40px) saturate(180%);
-	-webkit-backdrop-filter: blur(40px) saturate(180%); border-radius: 28px;
+	background: rgba(0,0,0,0.05); border-radius: 28px;
 	padding: 33px 50px 42px; border: 1px solid rgba(0,0,0,0.08);
-	box-shadow: 0 20px 60px rgba(31,38,135,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
 	text-align: center; width: 100%; max-width: 532px;
 }
 
@@ -192,16 +145,6 @@ body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
 }
 .session-title-input::placeholder { color: rgba(0,0,0,0.38); }
 .session-title-input:focus { background: rgba(255,255,255,0.7); border-color: rgba(120,120,255,0.5); }
-
-.notes-input {
- 	width: 100%; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1);
- 	border-radius: 14px; padding: 10px 16px; font-size: 13px; font-weight: 500;
- 	color: #1d1d1f; text-align: center; outline: none; margin-bottom: 22px;
- 	font-family: 'Inter', sans-serif; transition: all 0.2s ease;
- 	resize: vertical; min-height: 60px; overflow: hidden;
- }
-.notes-input::placeholder { color: rgba(0,0,0,0.33); }
-.notes-input:focus { background: rgba(255,255,255,0.7); border-color: rgba(120,120,255,0.5); }
 
 .title-label {
 	display: none;
@@ -261,34 +204,33 @@ body:has(.app.dark) .session-del { color: rgba(255,255,255,0.4); }
 
 .side-panel {
 	position: fixed; top: 0; right: 0; bottom: 0; width: 360px;
-	background: #ffffff;
-	border-left: 1px solid rgba(0,0,0,0.08);
-	transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-	z-index: 100; box-shadow: -20px 0 60px rgba(0,0,0,0.10); overflow-y: auto;
+	background: #0a0a0a;
+	border-left: 1px solid rgba(255,255,255,0.08);
+	color: #f5f5f7;
+	transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease;
+	z-index: 100; box-shadow: -20px 0 60px rgba(0,0,0,0); overflow-y: auto;
 }
-.side-panel.open { transform: translateX(0); }
-.panel-header { padding: 22px 26px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); position: sticky; top: 0; background: #ffffff; z-index: 2; }
+.side-panel.open { transform: translateX(0); box-shadow: -20px 0 60px rgba(0,0,0,0.10); }
+.panel-header { padding: 22px 26px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top: 0; background: #0a0a0a; z-index: 2; }
 .panel-title { font-size: 19px; font-weight: 700; }
-.close-btn { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.05); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease; }
-.close-btn:hover { background: rgba(0,0,0,0.10); }
-.close-btn svg { width: 16px; height: 16px; fill: rgba(0,0,0,0.5); }
+.close-btn { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.10); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease; }
+.close-btn:hover { background: rgba(255,255,255,0.18); }
+.close-btn svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.7); }
 .panel-header-actions { display: flex; gap: 8px; align-items: center; }
-.header-icon-btn { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,94,114,0.12); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease; }
-.header-icon-btn:hover { background: rgba(255,94,114,0.25); }
+.header-icon-btn { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,94,114,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease; }
+.header-icon-btn:hover { background: rgba(255,94,114,0.28); }
 .header-icon-btn svg { width: 15px; height: 15px; fill: #ff5e72; }
-body:has(.app.dark) .header-icon-btn { background: rgba(255,94,114,0.15); }
-body:has(.app.dark) .header-icon-btn:hover { background: rgba(255,94,114,0.28); }
 .panel-content { padding: 22px 26px; }
 
 .config-section { margin-bottom: 26px; }
-.config-section-title { font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
-.config-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.config-section-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
+.config-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .config-row:last-child { border-bottom: none; }
-.config-label { font-size: 15px; color: #1d1d1f; }
-.config-input { width: 72px; height: 34px; border-radius: 9px; border: 1px solid rgba(0,0,0,0.10); text-align: center; font-size: 15px; font-weight: 600; color: #1d1d1f; outline: none; background: rgba(255,255,255,0.95); font-family: inherit; transition: border-color 0.15s ease; }
+.config-label { font-size: 15px; color: #f5f5f7; }
+.config-input { width: 72px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); text-align: center; font-size: 15px; font-weight: 600; color: #f5f5f7; outline: none; background: rgba(255,255,255,0.08); font-family: inherit; transition: border-color 0.15s ease; }
 .config-input:focus { border-color: var(--accent, #7b8cff); }
-.toggle { width: 50px; height: 30px; border-radius: 15px; background: rgba(0,0,0,0.15); position: relative; cursor: pointer; transition: background 0.2s ease; }
-.toggle.active { background: var(--accent, #7b8cff); }
+.toggle { width: 50px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.18); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); position: relative; cursor: pointer; transition: background 0.2s ease; }
+.toggle.active { background: var(--accent, #7b8cff); box-shadow: none; }
 .toggle::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 .toggle.active::after { transform: translateX(20px); }
 
@@ -306,15 +248,15 @@ body:has(.app.dark) .header-icon-btn:hover { background: rgba(255,94,114,0.28); 
 .bg-ruby::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #FA4F67; box-shadow: 0 0 6px #FA4F67; }
 .bg-light { background: #f9f9f9; }
 .bg-light::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007A5E; box-shadow: 0 0 6px #007A5E; }
-.bg-graphite { background: #1D1D21; }
+.bg-graphite { background: #241c10; }
 .bg-graphite::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #F7C359; box-shadow: 0 0 6px #F7C359; }
-.bg-carbon { background: #1A1B1E; }
+.bg-carbon { background: #0a0a0a; }
 .bg-carbon::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #7CB518; box-shadow: 0 0 6px #7CB518; }
-.bg-amethyst { background: #0D1117; }
+.bg-amethyst { background: #180f2e; }
 .bg-amethyst::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #7A5AF8; box-shadow: 0 0 6px #7A5AF8; }
 
-.history-empty { text-align: center; color: rgba(0,0,0,0.4); font-size: 14px; padding: 40px 0; }
-.session-card { background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.06); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; position: relative; }
+.history-empty { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 40px 0; }
+.session-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; position: relative; }
 .session-card-head { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
 .session-type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .session-type-dot.Work { background: #FA4F67; }
@@ -322,20 +264,129 @@ body:has(.app.dark) .header-icon-btn:hover { background: rgba(255,94,114,0.28); 
 .session-type-dot.Read { background: #F7C359; }
 .session-type-dot.Fitness { background: #7CB518; }
 .session-card-title { font-size: 13px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.session-del { background: none; border: none; cursor: pointer; color: rgba(0,0,0,0.3); font-size: 15px; line-height: 1; padding: 0 2px; }
+.session-del { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.4); font-size: 15px; line-height: 1; padding: 0 2px; }
 .session-del:hover { color: #FA4F67; }
-.session-meta { font-size: 11px; color: rgba(0,0,0,0.5); display: flex; flex-wrap: wrap; gap: 3px 10px; }
-.session-notes { font-size: 11px; color: rgba(0,0,0,0.5); font-family: 'Inter', sans-serif; margin-top: 5px; font-style: italic; }
+.session-meta { font-size: 11px; color: rgba(255,255,255,0.55); display: flex; flex-wrap: wrap; gap: 3px 10px; }
 
-.resume-day { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.06); border-radius: 11px; margin-bottom: 8px; }
+.resume-day { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; margin-bottom: 8px; }
 .resume-day-label { font-size: 14px; font-weight: 600; }
-.resume-day-time { font-size: 14px; font-weight: 700; color: var(--accent); }
-body:has(.app.dark) .resume-day { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
-body:has(.app.dark) .resume-day-label { color: #f5f5f7; }
-body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
+.resume-day-time { font-size: 14px; font-weight: 700; color: #9ED13A; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 50; }
 .overlay.visible { opacity: 1; pointer-events: all; }
+
+/* ============================================================
+   Sticky Notes Panel - always-visible docked column
+   ============================================================ */
+.notes-panel {
+	width: 300px; flex-shrink: 0; height: 100vh; overflow-y: auto;
+	background: rgba(0,0,0,0.05);
+	border-left: 1px solid rgba(0,0,0,0.08);
+	display: flex; flex-direction: column; z-index: 5; position: relative;
+	scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.18) transparent;
+}
+.notes-panel.hidden { display: none; }
+.notes-panel::-webkit-scrollbar { width: 8px; }
+.notes-panel::-webkit-scrollbar-track { background: transparent; }
+.notes-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 8px; }
+.notes-panel::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+body:has(.app.dark) .notes-panel {
+	background: rgba(255,255,255,0.06);
+	border-left-color: rgba(255,255,255,0.12);
+	scrollbar-color: rgba(255,255,255,0.18) transparent;
+}
+body:has(.app.dark) .notes-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+body:has(.app.dark) .notes-panel::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+.notes-panel-header {
+	padding: 18px; display: flex; align-items: center; justify-content: space-between;
+	position: sticky; top: 0; background: inherit; z-index: 2;
+}
+.notes-panel-title { font-size: 15px; font-weight: 700; color: #1d1d1f; }
+body:has(.app.dark) .notes-panel-title { color: #f5f5f7; }
+.notes-panel-header-actions { display: flex; align-items: center; gap: 10px; }
+.notes-count { font-size: 11px; font-weight: 600; color: rgba(0,0,0,0.4); }
+body:has(.app.dark) .notes-count { color: rgba(255,255,255,0.4); }
+.notes-icon-btn {
+	width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.06); border: none;
+	cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;
+}
+.notes-icon-btn svg { width: 14px; height: 14px; fill: rgba(0,0,0,0.45); }
+.notes-icon-btn:hover { background: rgba(0,0,0,0.12); }
+.notes-icon-btn:hover svg { fill: rgba(0,0,0,0.7); }
+body:has(.app.dark) .notes-icon-btn { background: rgba(255,255,255,0.10); }
+body:has(.app.dark) .notes-icon-btn svg { fill: rgba(255,255,255,0.5); }
+body:has(.app.dark) .notes-icon-btn:hover { background: rgba(255,255,255,0.18); }
+body:has(.app.dark) .notes-icon-btn:hover svg { fill: rgba(255,255,255,0.85); }
+.notes-trash-btn:hover { background: rgba(255,94,114,0.20); }
+.notes-trash-btn:hover svg { fill: #ff5e72; }
+body:has(.app.dark) .notes-trash-btn:hover { background: rgba(255,94,114,0.28); }
+body:has(.app.dark) .notes-trash-btn:hover svg { fill: #ff5e72; }
+
+.sticky-notes-list { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.sticky-note {
+	position: relative; border-radius: 12px; padding: 12px 12px 10px;
+	border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.sticky-note:hover { transform: scale(1.015); box-shadow: 0 4px 14px rgba(0,0,0,0.12); z-index: 1; }
+
+.sticky-note.color-0 { background: rgba(255, 209, 102, 0.22); border-color: rgba(255, 190, 60, 0.35); }
+.sticky-note.color-1 { background: rgba(255, 138, 178, 0.18); border-color: rgba(255, 118, 164, 0.32); }
+.sticky-note.color-2 { background: rgba(108, 178, 255, 0.18); border-color: rgba(90, 160, 255, 0.32); }
+.sticky-note.color-3 { background: rgba(120, 224, 143, 0.20); border-color: rgba(95, 205, 120, 0.32); }
+.sticky-note.color-4 { background: rgba(190, 149, 255, 0.20); border-color: rgba(175, 130, 255, 0.34); }
+
+.sticky-note-del {
+	position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%;
+	background: rgba(0,0,0,0.08); border: none; cursor: pointer; display: flex; align-items: center;
+	justify-content: center; font-size: 13px; line-height: 1; color: rgba(0,0,0,0.45); transition: background 0.15s ease;
+}
+.sticky-note-del:hover { background: rgba(255,94,114,0.25); color: #ff5e72; }
+body:has(.app.dark) .sticky-note-del { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.5); }
+body:has(.app.dark) .sticky-note-del:hover { background: rgba(255,94,114,0.3); color: #ff8a97; }
+
+.sticky-note-text {
+	width: 100%; background: transparent; border: none; outline: none; resize: none;
+	font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.45; color: #1d1d1f;
+	padding-right: 18px; min-height: 44px; overflow: hidden;
+}
+.sticky-note-text::placeholder { color: rgba(0,0,0,0.35); }
+body:has(.app.dark) .sticky-note-text { color: #f5f5f7; }
+body:has(.app.dark) .sticky-note-text::placeholder { color: rgba(255,255,255,0.35); }
+
+.add-note-btn {
+	width: 100%; border-radius: 12px; padding: 14px 12px; text-align: center;
+	background: transparent; border: 1.5px dashed rgba(0,0,0,0.18); color: rgba(0,0,0,0.45);
+	font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+}
+.add-note-btn:hover { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.3); color: rgba(0,0,0,0.65); }
+body:has(.app.dark) .add-note-btn { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.5); }
+body:has(.app.dark) .add-note-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.75); }
+
+.notes-empty { text-align: center; color: rgba(0,0,0,0.35); font-size: 13px; padding: 30px 10px; }
+body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
+
+.trash-note { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; }
+.trash-note-text { font-size: 13px; color: #f5f5f7; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; margin-bottom: 6px; word-break: break-word; }
+.trash-note-text.empty { color: rgba(255,255,255,0.35); font-style: italic; }
+.trash-note-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.trash-note-expiry { font-size: 11px; color: rgba(255,255,255,0.45); }
+.trash-note-actions { display: flex; gap: 6px; }
+.trash-note-restore, .trash-note-purge {
+	font-family: inherit; font-size: 11px; font-weight: 600; border: none; border-radius: 7px; padding: 5px 9px; cursor: pointer; transition: all 0.15s ease;
+}
+.trash-note-restore { background: rgba(var(--accent-rgb, 0,122,94),0.14); color: var(--accent, #007A5E); }
+.trash-note-restore:hover { background: rgba(var(--accent-rgb, 0,122,94),0.24); }
+.trash-note-purge { background: rgba(255,94,114,0.12); color: #ff5e72; }
+.trash-note-purge:hover { background: rgba(255,94,114,0.22); }
+
+@media (max-width: 760px) {
+	.notes-panel { width: 240px; }
+}
+@media (max-width: 560px) {
+	.notes-panel { display: none; }
+}
 
 @media (max-width: 400px) {
 	.app { min-width: 10vw; }
@@ -354,7 +405,6 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 	.tag-text { font-size: 11px; }
 	.tag.active .tag-text { max-width: 60px; }
 	.session-title-input { padding: 9px 12px; font-size: 13px; border-radius: 11px; margin-bottom: 8px; }
-	.notes-input { padding: 8px 12px; font-size: 11px; border-radius: 11px; margin-bottom: 16px; }
 	.title-label { font-size: 16px; margin-bottom: 8px; }
 }
 </style>
@@ -365,8 +415,11 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 <div class="app" id="app">
 
 	<div class="header">
-		<div class="logo">Pomodoro timer</div>
+		<div class="logo">Pomodoro</div>
 		<div class="header-actions">
+			<button class="icon-btn" id="showNotesBtn" title="Show Notes" style="display:none">
+				<svg viewBox="0 0 24 24"><path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm1 2v12h9V6H5zm11 0v12h3V6h-3z"/></svg>
+			</button>
 			<button class="icon-btn" id="historyBtn" title="Session History">
 				<svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.97 8.97 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
 			</button>
@@ -402,7 +455,6 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 
 			<input type="text" class="session-title-input" id="sessionTitle" placeholder="Session title...">
 			<div class="title-label" id="titleLabel"></div>
-			<textarea class="notes-input" id="notes" placeholder="Add notes..." rows="2"></textarea>
 
 			<div class="timer-display" id="timerDisplay">25:00</div>
 			<div class="session-info" id="sessionInfo">Rounds 1/2</div>
@@ -424,6 +476,23 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 		</div>
 	</div>
 	<div class="signature">Designed by <span class="brand">Paolium</span></div>
+</div>
+
+<!-- Sticky notes panel - always visible -->
+<div class="notes-panel" id="notesPanel">
+	<div class="notes-panel-header">
+		<div class="notes-panel-title">Notes</div>
+		<div class="notes-panel-header-actions">
+			<div class="notes-count" id="notesCount">0/20</div>
+			<button class="notes-icon-btn notes-trash-btn" id="trashBtn" title="Trash">
+				<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+			</button>
+			<button class="notes-icon-btn" id="hideNotesBtn" title="Hide Notes">
+				<svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+			</button>
+		</div>
+	</div>
+	<div class="sticky-notes-list" id="stickyNotesList"></div>
 </div>
 
 <!-- Settings panel -->
@@ -491,6 +560,17 @@ body:has(.app.dark) .resume-day-time { color: var(--accent-2, #FFA566); }
 	</div>
 </div>
 
+<!-- Notes trash panel -->
+<div class="side-panel" id="trashPanel">
+	<div class="panel-header">
+		<div class="panel-title">Trash</div>
+		<button class="close-btn" data-close="trashPanel"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+	</div>
+	<div class="panel-content" id="trashContent">
+		<div class="history-empty">Trash is empty.</div>
+	</div>
+</div>
+
 <script>
 // ============================================================
 // DOM Elements
@@ -504,7 +584,6 @@ const settingsBtn = $('settingsBtn');
 const timerDisplay = $('timerDisplay');
 const sessionInfo = $('sessionInfo');
 const sessionTitle = $('sessionTitle');
-const notes = $('notes');
 const titleLabel = $('titleLabel');
 const timerCard = $('timerCard');
 
@@ -515,7 +594,10 @@ const vscodeApi = acquireVsCodeApi();
 let state = null;
 let config = null;
 let history = [];
+let stickyNotes = [];
+let trashNotes = [];
 let isPlaying = false;
+const MAX_NOTES = 20;
 
 // Cached render signatures so we only touch the DOM when the relevant
 // state actually changes (the timer ticks once per second).
@@ -534,13 +616,13 @@ const lightBackgrounds = ['light'];
    // ============================================================
    const backgroundGradients = {
    	transparent: '',
-   	paolium:  'radial-gradient(120% 110% at 12% 8%, rgba(0,122,94,0.20) 0%, rgba(0,122,94,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(0,204,156,0.15) 0%, rgba(0,204,156,0) 48%), radial-gradient(150% 130% at 50% 0%, #15291f 0%, #0d1f17 45%, #060f0a 100%)',
-   	sapphire: 'radial-gradient(120% 110% at 12% 8%, rgba(13,113,253,0.22) 0%, rgba(13,113,253,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(13,113,253,0.14) 0%, rgba(13,113,253,0) 48%), radial-gradient(150% 130% at 50% 0%, #0b2750 0%, #061a36 45%, #010d1f 100%)',
-   	ruby:     'radial-gradient(120% 110% at 12% 8%, rgba(250,79,103,0.20) 0%, rgba(250,79,103,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(255,107,133,0.13) 0%, rgba(255,107,133,0) 48%), radial-gradient(150% 130% at 50% 0%, #2a1520 0%, #1c0e15 45%, #120810 100%)',
-   	light:    'radial-gradient(120% 110% at 12% 8%, rgba(122,90,248,0.18) 0%, rgba(122,90,248,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(176,196,222,0.20) 0%, rgba(176,196,222,0) 48%), radial-gradient(150% 130% at 50% 0%, #ffffff 0%, #f4f4f7 45%, #ececf2 100%)',
-   	graphite: 'radial-gradient(120% 110% at 12% 8%, rgba(247,195,89,0.16) 0%, rgba(247,195,89,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(192,192,192,0.10) 0%, rgba(192,192,192,0) 48%), radial-gradient(150% 130% at 50% 0%, #2a2a30 0%, #1d1d21 45%, #131316 100%)',
-   	carbon:   'radial-gradient(120% 110% at 12% 8%, rgba(124,181,24,0.18) 0%, rgba(124,181,24,0) 42%), radial-gradient(110% 110% at 88% 85%, rgba(144,238,144,0.10) 0%, rgba(144,238,144,0) 48%), radial-gradient(150% 130% at 50% 0%, #26282a 0%, #1a1b1e 45%, #111214 100%)',
-   	amethyst: 'radial-gradient(120% 110% at 15% 10%, rgba(122,90,248,0.22) 0%, rgba(122,90,248,0) 42%), radial-gradient(110% 110% at 85% 88%, rgba(122,90,248,0.13) 0%, rgba(122,90,248,0) 48%), radial-gradient(150% 130% at 50% 0%, #1a1730 0%, #11101d 45%, #0a0a12 100%)'
+   	paolium:  '#0d1f17',
+   	sapphire: '#061a36',
+   	ruby:     '#1c0e15',
+   	light:    '#f9f9f9',
+   	graphite: '#241c10',
+   	carbon:   '#0a0a0a',
+   	amethyst: '#180f2e'
    };
 
 
@@ -621,6 +703,7 @@ document.addEventListener('click', initAudioContext, { once: true });
 // Event Listeners - Timer Controls
 // ============================================================
 playBtn.addEventListener('click', () => {
+	if (!isPlaying) closeSidePanels();
 	vscodeApi.postMessage({ type: isPlaying ? 'pause' : 'start' });
 });
 
@@ -649,6 +732,21 @@ $('historyBtn').addEventListener('click', () => {
 $('resumeBtn').addEventListener('click', () => {
 	vscodeApi.postMessage({ type: 'getHistory' });
 	openSidePanel('resumePanel');
+});
+
+$('trashBtn').addEventListener('click', () => {
+	renderTrash();
+	openSidePanel('trashPanel');
+});
+
+$('hideNotesBtn').addEventListener('click', () => {
+	$('notesPanel').classList.add('hidden');
+	$('showNotesBtn').style.display = '';
+});
+
+$('showNotesBtn').addEventListener('click', () => {
+	$('notesPanel').classList.remove('hidden');
+	$('showNotesBtn').style.display = 'none';
 });
 
 $('clearHistoryHeaderBtn').addEventListener('click', () => {
@@ -688,10 +786,6 @@ function closeSidePanels() {
 sessionTitle.addEventListener('change', e => {
 	vscodeApi.postMessage({ type: 'setTitle', title: e.target.value });
 });
-
-notes.addEventListener('input', e => {
- 	vscodeApi.postMessage({ type: 'setNotes', notes: e.target.value });
- });
 
 // ============================================================
 // Event Listeners - Tag Selection
@@ -759,6 +853,7 @@ function applyBackground(bg) {
 	const gradient = backgroundGradients[bg] || backgroundGradients.transparent;
 
 	app.style.background = gradient;
+	document.body.style.background = gradient;
 
 app.classList.toggle('transparent', bg === 'transparent');
 	app.classList.remove('theme-paolium','theme-sapphire','theme-ruby','theme-light','theme-graphite','theme-carbon','theme-amethyst');
@@ -784,8 +879,11 @@ window.addEventListener('message', (event) => {
 			state = message.state;
 			config = message.config;
 			history = message.history || [];
+			stickyNotes = message.notes || [];
+			trashNotes = message.trash || [];
 			applyConfig();
 			renderHistory();
+			renderStickyNotes();
 			updateUI();
 			break;
 
@@ -802,6 +900,13 @@ window.addEventListener('message', (event) => {
 
 		case 'playSound':
 			playChime(message.sound);
+			break;
+
+		case 'notesState':
+			stickyNotes = message.notes || [];
+			trashNotes = message.trash || [];
+			renderStickyNotes();
+			renderTrash();
 			break;
 	}
 });
@@ -858,10 +963,6 @@ function updateUI() {
 	}
 
 // Notes (only if not focused)
- 	if (state.notes !== undefined && document.activeElement !== notes) {
- 		notes.value = state.notes;
-	}
-
 	// Tag selection
 	if (state.sessionTag) {
 		document.querySelectorAll('.tag').forEach(t => {
@@ -957,7 +1058,6 @@ function renderHistory() {
 					<span>⏱ ${formatDuration(session.durationSeconds)}</span>
 					<span>${session.type}</span>
 				</div>
-				${session.notes ? `<div class="session-notes">${escapeHtml(session.notes)}</div>` : ''}
 			</div>
 		`;
 	});
@@ -1017,6 +1117,113 @@ function renderResume() {
 	});
 
 	container.innerHTML = html;
+}
+
+// ============================================================
+// Sticky Notes
+// ============================================================
+const noteSaveTimers = {};
+
+function autoGrow(textarea) {
+	textarea.style.height = 'auto';
+	textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+function renderStickyNotes() {
+	const list = $('stickyNotesList');
+	const count = $('notesCount');
+	count.textContent = `${stickyNotes.length}/${MAX_NOTES}`;
+
+	let html = '';
+
+	if (stickyNotes.length < MAX_NOTES) {
+		html += '<button class="add-note-btn" id="addNoteBtn">+ Add note</button>';
+	}
+
+	stickyNotes.forEach((note, index) => {
+		html += `
+			<div class="sticky-note color-${index % 5}">
+				<button class="sticky-note-del" data-id="${note.id}" title="Delete note">&times;</button>
+				<textarea class="sticky-note-text" data-id="${note.id}" placeholder="Write a note...">${escapeHtml(note.text)}</textarea>
+			</div>
+		`;
+	});
+
+	if (!stickyNotes.length) {
+		html += '<div class="notes-empty">No notes yet.</div>';
+	}
+
+	list.innerHTML = html;
+
+	list.querySelectorAll('.sticky-note-text').forEach(el => {
+		autoGrow(el);
+		el.addEventListener('input', e => {
+			autoGrow(el);
+			const id = el.dataset.id;
+			const text = el.value;
+			clearTimeout(noteSaveTimers[id]);
+			noteSaveTimers[id] = setTimeout(() => {
+				vscodeApi.postMessage({ type: 'updateNote', id, text });
+			}, 300);
+		});
+	});
+
+	list.querySelectorAll('.sticky-note-del').forEach(btn => {
+		btn.addEventListener('click', () => {
+			vscodeApi.postMessage({ type: 'deleteNote', id: btn.dataset.id });
+		});
+	});
+
+	const addBtn = $('addNoteBtn');
+	if (addBtn) {
+		addBtn.addEventListener('click', () => {
+			vscodeApi.postMessage({ type: 'addNote' });
+		});
+	}
+}
+
+const TRASH_RETENTION_DAYS = 30;
+
+function renderTrash() {
+	const container = $('trashContent');
+
+	if (!trashNotes.length) {
+		container.innerHTML = '<div class="history-empty">Trash is empty.</div>';
+		return;
+	}
+
+	let html = '';
+	trashNotes.forEach(note => {
+		const deletedAt = new Date(note.deletedAt);
+		const daysLeft = Math.max(0, TRASH_RETENTION_DAYS - Math.floor((Date.now() - deletedAt.getTime()) / 86400000));
+		const text = note.text ? escapeHtml(note.text) : '';
+		html += `
+			<div class="trash-note">
+				<div class="trash-note-text${text ? '' : ' empty'}">${text || '(empty note)'}</div>
+				<div class="trash-note-meta">
+					<span class="trash-note-expiry">Expires in ${daysLeft}d</span>
+					<div class="trash-note-actions">
+						<button class="trash-note-restore" data-id="${note.id}">Restore</button>
+						<button class="trash-note-purge" data-id="${note.id}">Delete</button>
+					</div>
+				</div>
+			</div>
+		`;
+	});
+
+	container.innerHTML = html;
+
+	container.querySelectorAll('.trash-note-restore').forEach(btn => {
+		btn.addEventListener('click', () => {
+			vscodeApi.postMessage({ type: 'restoreNote', id: btn.dataset.id });
+		});
+	});
+
+	container.querySelectorAll('.trash-note-purge').forEach(btn => {
+		btn.addEventListener('click', () => {
+			vscodeApi.postMessage({ type: 'permanentlyDeleteNote', id: btn.dataset.id });
+		});
+	});
 }
 </script>
 </body>

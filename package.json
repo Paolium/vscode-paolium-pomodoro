@@ -3,7 +3,7 @@
   "displayName": "Paolium Pomodoro",
   "publisher": "Paolium",
   "author": "Paolium",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "A beautiful and an elegant Pomodoro timer",
   "license": "MIT",
   "icon": "paolium-icon.png",
@@ -37,12 +37,12 @@
     "commands": [
       {
         "command": "paolium-pomodoro-focus.open",
-        "title": "Open Pomodoro Timer",
+        "title": "Open",
         "category": "Pomodoro"
       },
       {
         "command": "paolium-pomodoro-focus.close",
-        "title": "Close Pomodoro Timer",
+        "title": "Close",
         "category": "Pomodoro"
       }
     ],

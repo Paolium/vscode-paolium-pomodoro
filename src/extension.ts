@@ -97,7 +97,6 @@ function handleSessionComplete(): void {
 		date: new Date().toISOString(),
 		durationSeconds: state.elapsedSeconds,
 		title: state.sessionTitle || 'Untitled Session',
-		notes: state.notes || '',
 		type: state.sessionTag || 'Work'
 	};
 
@@ -123,7 +122,7 @@ async function openPanel(context: vscode.ExtensionContext): Promise<void> {
 
 	const panel = vscode.window.createWebviewPanel(
 		'paolium-pomodoro-focus.panel',
-		'Paolium Pomodoro',
+		'Pomodoro',
 		vscode.ViewColumn.One,
 		{
 			enableScripts: true,
@@ -140,11 +139,15 @@ async function openPanel(context: vscode.ExtensionContext): Promise<void> {
 		currentPanel = undefined;
 	});
 
+	const trash = await storage.purgeExpiredTrash();
+
 	panel.webview.postMessage({
 		type: 'init',
 		state: timer.getState(),
 		config: storage.getConfig(),
-		history: storage.getHistory()
+		history: storage.getHistory(),
+		notes: storage.getNotes(),
+		trash
 	});
 }
 
@@ -157,9 +160,6 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 		case 'stop': timer.stop(); break;
 		case 'setTitle': timer.setSessionTitle(message.title as string); break;
 		case 'setTag': timer.setSessionTag(message.tag as string); break;
-		case 'setNotes':
-			timer.setNotes(message.notes as string);
-			break;
 		case 'updateConfig':
 			storage.updateConfig(message.config as Record<string, unknown>).then(() => {
 				timer.refreshConfig();
@@ -184,6 +184,39 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 				currentPanel?.webview.postMessage({ type: 'history', history: storage.getHistory() });
 			}).catch((err: Error) => {
 				vscode.window.showErrorMessage(`Failed to clear history: ${err.message}`);
+			});
+			break;
+		case 'addNote':
+			storage.addNote().then((notes) => {
+				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash: storage.getTrash() });
+			}).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to add note: ${err.message}`);
+			});
+			break;
+		case 'updateNote':
+			storage.updateNote(message.id as string, message.text as string).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to save note: ${err.message}`);
+			});
+			break;
+		case 'deleteNote':
+			storage.deleteNote(message.id as string).then(({ notes, trash }) => {
+				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash });
+			}).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to delete note: ${err.message}`);
+			});
+			break;
+		case 'restoreNote':
+			storage.restoreNote(message.id as string).then(({ notes, trash }) => {
+				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash });
+			}).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to restore note: ${err.message}`);
+			});
+			break;
+		case 'permanentlyDeleteNote':
+			storage.permanentlyDeleteNote(message.id as string).then((trash) => {
+				currentPanel?.webview.postMessage({ type: 'notesState', notes: storage.getNotes(), trash });
+			}).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to delete note: ${err.message}`);
 			});
 			break;
 	}

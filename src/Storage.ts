@@ -21,9 +21,23 @@ export interface SessionRecord {
  	date: string;
  	durationSeconds: number;
  	title: string;
- 	notes: string;
  	type: string;
  }
+
+/**
+ * A single sticky note in the always-visible notes panel
+ */
+export interface StickyNote {
+	id: string;
+	text: string;
+}
+
+/**
+ * A sticky note that has been deleted and is awaiting permanent removal
+ */
+export interface TrashedNote extends StickyNote {
+	deletedAt: string;
+}
 
 const DEFAULT_CONFIG: PomodoroConfig = {
 	focusDuration: 25,
@@ -36,6 +50,12 @@ const DEFAULT_CONFIG: PomodoroConfig = {
 };
 
 const HISTORY_KEY = 'pomodoroSessionHistory';
+const MAX_HISTORY = 200;
+const NOTES_KEY = 'pomodoroStickyNotes';
+const TRASH_KEY = 'pomodoroStickyNotesTrash';
+const MAX_NOTES = 20;
+const MAX_TRASH = 50;
+const TRASH_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
  * Manages extension persistence: configuration and session history.
@@ -46,7 +66,6 @@ export class Storage {
 	// Session metadata (simplified - public access)
 	public sessionTitle: string = '';
 	public sessionTag: string = 'Work';
-	public notes: string = '';
 
 	constructor(context: vscode.ExtensionContext) {
 		this.context = context;
@@ -91,6 +110,7 @@ export class Storage {
 	async addSession(record: SessionRecord): Promise<void> {
 		const history = this.getHistory();
 		history.unshift(record);
+		history.length = Math.min(history.length, MAX_HISTORY);
 		await this.context.globalState.update(HISTORY_KEY, history);
 	}
 
@@ -107,5 +127,102 @@ export class Storage {
 	 */
 	async clearHistory(): Promise<void> {
 		await this.context.globalState.update(HISTORY_KEY, []);
+	}
+
+	/**
+	 * Returns all sticky notes, persisted independently of any session
+	 */
+	getNotes(): StickyNote[] {
+		return this.context.globalState.get<StickyNote[]>(NOTES_KEY, []);
+	}
+
+	/**
+	 * Appends a new blank sticky note, up to MAX_NOTES. Returns the updated list.
+	 */
+	async addNote(): Promise<StickyNote[]> {
+		const notes = this.getNotes();
+		if (notes.length >= MAX_NOTES) return notes;
+		notes.push({ id: Date.now().toString(), text: '' });
+		await this.context.globalState.update(NOTES_KEY, notes);
+		return notes;
+	}
+
+	/**
+	 * Updates the text of a sticky note by ID
+	 */
+	async updateNote(id: string, text: string): Promise<void> {
+		const notes = this.getNotes();
+		const note = notes.find(n => n.id === id);
+		if (!note) return;
+		note.text = text;
+		await this.context.globalState.update(NOTES_KEY, notes);
+	}
+
+	/**
+	 * Removes a sticky note by ID. Blank notes are deleted permanently; notes with
+	 * content are moved to the trash instead. Returns the updated notes and trash lists.
+	 */
+	async deleteNote(id: string): Promise<{ notes: StickyNote[]; trash: TrashedNote[] }> {
+		const notes = this.getNotes();
+		const index = notes.findIndex(n => n.id === id);
+		if (index === -1) return { notes, trash: this.getTrash() };
+
+		const [removed] = notes.splice(index, 1);
+		await this.context.globalState.update(NOTES_KEY, notes);
+
+		if (!removed.text.trim()) {
+			return { notes, trash: this.getTrash() };
+		}
+
+		const trash = this.getTrash();
+		trash.unshift({ ...removed, deletedAt: new Date().toISOString() });
+		trash.length = Math.min(trash.length, MAX_TRASH);
+		await this.context.globalState.update(TRASH_KEY, trash);
+
+		return { notes, trash };
+	}
+
+	/**
+	 * Returns all trashed notes
+	 */
+	getTrash(): TrashedNote[] {
+		return this.context.globalState.get<TrashedNote[]>(TRASH_KEY, []);
+	}
+
+	/**
+	 * Moves a trashed note back into the active notes list. Returns the updated notes and trash lists.
+	 */
+	async restoreNote(id: string): Promise<{ notes: StickyNote[]; trash: TrashedNote[] }> {
+		const trash = this.getTrash();
+		const index = trash.findIndex(n => n.id === id);
+		if (index === -1) return { notes: this.getNotes(), trash };
+
+		const [restored] = trash.splice(index, 1);
+		await this.context.globalState.update(TRASH_KEY, trash);
+
+		const notes = this.getNotes();
+		notes.push({ id: restored.id, text: restored.text });
+		await this.context.globalState.update(NOTES_KEY, notes);
+
+		return { notes, trash };
+	}
+
+	/**
+	 * Permanently removes a note from the trash by ID
+	 */
+	async permanentlyDeleteNote(id: string): Promise<TrashedNote[]> {
+		const trash = this.getTrash().filter(n => n.id !== id);
+		await this.context.globalState.update(TRASH_KEY, trash);
+		return trash;
+	}
+
+	/**
+	 * Removes trashed notes older than the 30-day retention window. Meant to run on panel open.
+	 */
+	async purgeExpiredTrash(): Promise<TrashedNote[]> {
+		const now = Date.now();
+		const trash = this.getTrash().filter(n => now - new Date(n.deletedAt).getTime() < TRASH_RETENTION_MS);
+		await this.context.globalState.update(TRASH_KEY, trash);
+		return trash;
 	}
 }

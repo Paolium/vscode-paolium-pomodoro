@@ -17,8 +17,8 @@ A beautiful and an elegant Pomodoro timer.
 
 Press `CTRL + SHIFT + P` to open the Command Palette and search:
 
-- `Pomodoro: Open Pomodoro Timer` - Open the timer panel
-- `Pomodoro: Close Pomodoro Timer` - Terminate the timer
+- `Pomodoro: Open` - Open the timer panel
+- `Pomodoro: Close` - Terminate the timer
 
 ## Configuration
 
