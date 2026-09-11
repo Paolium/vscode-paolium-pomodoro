@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.0.0
+### Added
+- Timer / Notes tab switcher in the header, replacing the separate history, time-by-day, and notes-toggle icons
+- Freeform notes canvas: notes can be dragged and resized anywhere, with position and size remembered
+- Quick "add note" button in the Notes tab
+- Compact floating Time by Day widget shown while on the Timer tab
+### Changed
+- Focus and break phases now always transition into each other automatically
+- Sticky notes use a more solid, opaque background for better readability
+### Removed
+- Session History panel and per-session browsing/deletion
+- Auto-start breaks/focus settings (this behavior is now always on)
+
 ## v2.1.0
 ### Added
 - Color picker for sticky notes, using the app's own theme colors as the palette

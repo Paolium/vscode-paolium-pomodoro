@@ -48,6 +48,11 @@ body {
 .app.dark .tag:not(.active) { background: rgba(15,15,20,0.55); border-color: rgba(255,255,255,0.06); }
 .app.dark .icon-btn { background: rgba(255,255,255,0.12); }
 .app.dark .icon-btn svg { fill: rgba(255,255,255,0.8); }
+.tab-switcher { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(118,118,128,0.16); }
+.tab-button { min-width: 70px; border: 0; border-radius: 8px; padding: 6px 13px; background: transparent; color: rgba(0,0,0,0.55); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s ease; }
+.tab-button.active { background: rgba(255,255,255,.85); color: #1d1d1f; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.app.dark .tab-button { color: rgba(255,255,255,.6); }
+.app.dark .tab-button.active { background: rgba(255,255,255,.18); color: #fff; }
 /* Side panels (History/Settings/Time-by-Day/Trash) are always solid carbon-black,
    regardless of the selected app background theme. */
 
@@ -96,6 +101,7 @@ body {
 .signature .brand { font-family: 'MuseoModerno', sans-serif; font-weight: 400; }
 .app.dark .signature { color: rgba(255,255,255,0.35); }
 .header-actions { display: flex; gap: 10px; }
+.header-actions { margin-left: auto; }
 .icon-btn {
 	width: 38px; height: 38px; border-radius: 50%;
 	background: rgba(255,255,255,0.75);
@@ -385,6 +391,32 @@ body:has(.app.dark) .add-note-btn:hover { background: rgba(255,255,255,0.06); bo
 
 .notes-empty { text-align: center; color: rgba(0,0,0,0.35); font-size: 13px; padding: 30px 10px; }
 body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
+.notes-panel { position: fixed; inset: 70px 0 0; width: auto; height: auto; background: transparent !important; border: 0; display: none; z-index: 3; overflow: hidden; }
+.notes-panel.notes-visible { display: flex; }
+.app.notes-mode .main-content { display: none; }
+.notes-panel { overflow: visible; }
+.notes-panel-header { position: absolute; top: -70px; right: 70px; padding: 16px 0; }
+.notes-panel-header-actions { gap: 8px; }
+.notes-panel-title { display: none; }
+.notes-panel-header { justify-content: flex-end; }
+.sticky-notes-list { position: relative; display: block; padding: 0; flex: 1; overflow: hidden; }
+.sticky-note { position: absolute; width: 210px; min-width: 160px; min-height: 112px; height: auto; display: flex; flex-direction: column; cursor: grab; user-select: none; resize: both; overflow: hidden; transition: box-shadow .18s ease; }
+.notes-panel .sticky-note { width: 240px; min-height: 112px; }
+.sticky-note:active { cursor: grabbing; box-shadow: 0 12px 28px rgba(0,0,0,.2); }
+.sticky-note-text { user-select: text; display: block; flex: 1 1 0; box-sizing: border-box; width: 100%; height: auto; min-height: 44px; max-height: none; overflow-y: auto; white-space: pre-wrap; }
+.notes-panel .notes-icon-btn { width: 38px; height: 38px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.06); }
+.notes-panel .notes-icon-btn svg { width: 17px; height: 17px; fill: rgba(255,255,255,.78); }
+.notes-panel .notes-icon-btn:hover { background: rgba(255,255,255,.2); }
+.add-note-btn { display: none; }
+.notes-empty { padding-top: 90px; }
+.time-widget { position: fixed; top: 50%; right: 12px; width: 132px; max-height: 260px; transform: translateY(-50%); z-index: 1; display: block; background: rgba(0,0,0,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; color: #f5f5f7; opacity: .48; pointer-events: none; overflow: hidden; }
+.time-widget .panel-header { padding: 10px 12px; background: transparent; border-bottom: 1px solid rgba(255,255,255,.08); }
+.time-widget .panel-title { font-size: 11px; }
+.time-widget .panel-content { padding: 10px; }
+.time-widget .resume-day { padding: 6px 0; margin: 0; border: 0; background: transparent; }
+.time-widget .resume-day-label, .time-widget .resume-day-time { font-size: 10px; }
+.time-widget .close-btn { display: none; }
+@media (max-width: 560px) { .tab-switcher { position: static; transform: none; margin-left: auto; margin-right: 10px; } .header { padding: 12px 14px; } .time-widget { right: 6px; width: 108px; } }
 
 .trash-note { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; }
 .trash-note-text { font-size: 13px; color: #f5f5f7; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; margin-bottom: 6px; word-break: break-word; }
@@ -403,9 +435,7 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 @media (max-width: 760px) {
 	.notes-panel { width: 240px; }
 }
-@media (max-width: 560px) {
-	.notes-panel { display: none; }
-}
+@media (max-width: 560px) { .notes-panel:not(.notes-visible) { display: none; } }
 
 @media (max-width: 400px) {
 	.app { min-width: 10vw; }
@@ -434,17 +464,11 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 <div class="app" id="app">
 
 	<div class="header">
-		<div class="logo">Pomodoro</div>
+		<div class="tab-switcher" role="tablist" aria-label="Pomodoro view">
+			<button class="tab-button active" id="timerTab" role="tab" aria-selected="true">Timer</button>
+			<button class="tab-button" id="notesTab" role="tab" aria-selected="false">Notes</button>
+		</div>
 		<div class="header-actions">
-			<button class="icon-btn" id="showNotesBtn" title="Show Notes" style="display:none">
-				<svg viewBox="0 0 24 24"><path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm1 2v12h9V6H5zm11 0v12h3V6h-3z"/></svg>
-			</button>
-			<button class="icon-btn" id="historyBtn" title="Session History">
-				<svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.97 8.97 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-			</button>
-			<button class="icon-btn" id="resumeBtn" title="Time by Day">
-				<svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-			</button>
 			<button class="icon-btn" id="settingsBtn" title="Settings">
 				<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
 			</button>
@@ -500,14 +524,11 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 <!-- Sticky notes panel - always visible -->
 <div class="notes-panel" id="notesPanel">
 	<div class="notes-panel-header">
-		<div class="notes-panel-title">Notes</div>
 		<div class="notes-panel-header-actions">
 			<div class="notes-count" id="notesCount">0/20</div>
+			<button class="notes-icon-btn" id="addNoteTopBtn" title="Add note"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
 			<button class="notes-icon-btn notes-trash-btn" id="trashBtn" title="Trash">
 				<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-			</button>
-			<button class="notes-icon-btn" id="hideNotesBtn" title="Hide Notes">
-				<svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
 			</button>
 		</div>
 	</div>
@@ -529,8 +550,7 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 		</div>
 		<div class="config-section">
 			<div class="config-section-title">Automation</div>
-			<div class="config-row"><span class="config-label">Auto-start breaks</span><div class="toggle active" id="autoStartBreaks"></div></div>
-			<div class="config-row"><span class="config-label">Auto-start focus</span><div class="toggle" id="autoStartFocus"></div></div>
+			<div class="config-row"><span class="config-label">Focus and breaks transition automatically</span><span aria-hidden="true">✓</span></div>
 		</div>
 		<div class="config-section">
 			<div class="config-section-title">Notifications</div>
@@ -552,27 +572,10 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 	</div>
 </div>
 
-<!-- History panel -->
-<div class="side-panel" id="historyPanel">
-	<div class="panel-header">
-		<div class="panel-title">Session History</div>
-		<div class="panel-header-actions">
-			<button class="header-icon-btn" id="clearHistoryHeaderBtn" title="Clear all history" style="display:none">
-				<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-			</button>
-			<button class="close-btn" data-close="historyPanel"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
-		</div>
-	</div>
-	<div class="panel-content" id="historyContent">
-		<div class="history-empty">No sessions yet.<br>Complete a session to see it here.</div>
-	</div>
-</div>
-
 <!-- Time by Day panel -->
-<div class="side-panel" id="resumePanel">
+<div class="side-panel time-widget" id="resumePanel">
 	<div class="panel-header">
 		<div class="panel-title">Time by Day</div>
-		<button class="close-btn" data-close="resumePanel"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
 	</div>
 	<div class="panel-content" id="resumeContent">
 		<div class="history-empty">No sessions yet.<br>Complete a session to see it here.</div>
@@ -605,6 +608,9 @@ const sessionInfo = $('sessionInfo');
 const sessionTitle = $('sessionTitle');
 const titleLabel = $('titleLabel');
 const timerCard = $('timerCard');
+const timerTab = $('timerTab');
+const notesTab = $('notesTab');
+const notesPanel = $('notesPanel');
 
 // ============================================================
 // State
@@ -616,6 +622,7 @@ let history = [];
 let stickyNotes = [];
 let trashNotes = [];
 let isPlaying = false;
+let activeTab = 'timer';
 const MAX_NOTES = 20;
 
 // Cached render signatures so we only touch the DOM when the relevant
@@ -743,34 +750,14 @@ $('stopBtn').addEventListener('click', () => {
 // ============================================================
 settingsBtn.addEventListener('click', () => openSidePanel('configPanel'));
 
-$('historyBtn').addEventListener('click', () => {
-	vscodeApi.postMessage({ type: 'getHistory' });
-	openSidePanel('historyPanel');
-});
-
-$('resumeBtn').addEventListener('click', () => {
-	vscodeApi.postMessage({ type: 'getHistory' });
-	openSidePanel('resumePanel');
-});
-
 $('trashBtn').addEventListener('click', () => {
 	renderTrash();
 	openSidePanel('trashPanel');
 });
 
-$('hideNotesBtn').addEventListener('click', () => {
-	$('notesPanel').classList.add('hidden');
-	$('showNotesBtn').style.display = '';
-});
-
-$('showNotesBtn').addEventListener('click', () => {
-	$('notesPanel').classList.remove('hidden');
-	$('showNotesBtn').style.display = 'none';
-});
-
-$('clearHistoryHeaderBtn').addEventListener('click', () => {
-	vscodeApi.postMessage({ type: 'clearHistory' });
-});
+$('addNoteTopBtn').addEventListener('click', () => vscodeApi.postMessage({ type: 'addNote' }));
+timerTab.addEventListener('click', () => setTab('timer'));
+notesTab.addEventListener('click', () => setTab('notes'));
 
 document.querySelectorAll('[data-close]').forEach(btn => {
 	btn.addEventListener('click', closeSidePanels);
@@ -826,24 +813,6 @@ document.querySelectorAll('.tag').forEach(tag => {
 	});
 });
 
-$('autoStartBreaks').addEventListener('click', e => {
-	const toggled = e.currentTarget;
-	toggled.classList.toggle('active');
-	vscodeApi.postMessage({
-		type: 'updateConfig',
-		config: { autoStartBreaks: toggled.classList.contains('active') }
-	});
-});
-
-$('autoStartFocus').addEventListener('click', e => {
-	const toggled = e.currentTarget;
-	toggled.classList.toggle('active');
-	vscodeApi.postMessage({
-		type: 'updateConfig',
-		config: { autoStartFocus: toggled.classList.contains('active') }
-	});
-});
-
 $('enableSounds').addEventListener('click', e => {
 	const toggled = e.currentTarget;
 	toggled.classList.toggle('active');
@@ -873,8 +842,11 @@ function applyBackground(bg) {
 
 	app.style.background = gradient;
 	document.body.style.background = gradient;
+	// Notes is a sibling overlay, so give it the same explicit surface as the app.
+	// Notes shares the app canvas instead of painting a second background layer.
+	notesPanel.style.background = 'transparent';
 
-app.classList.toggle('transparent', bg === 'transparent');
+	app.classList.toggle('transparent', bg === 'transparent');
 	app.classList.remove('theme-paolium','theme-sapphire','theme-ruby','theme-light','theme-graphite','theme-carbon','theme-amethyst');
 	document.body.classList.remove('theme-paolium','theme-sapphire','theme-ruby','theme-light','theme-graphite','theme-carbon','theme-amethyst');
 	if (bg && bg !== 'transparent') {
@@ -885,6 +857,19 @@ app.classList.toggle('transparent', bg === 'transparent');
 	// Dark mode for dark backgrounds (all except light theme)
 	const isDark = !lightBackgrounds.includes(bg);
 	app.classList.toggle('dark', isDark);
+}
+
+function setTab(tab, persist = true) {
+	activeTab = tab === 'notes' ? 'notes' : 'timer';
+	const showingNotes = activeTab === 'notes';
+	timerTab.classList.toggle('active', !showingNotes);
+	notesTab.classList.toggle('active', showingNotes);
+	timerTab.setAttribute('aria-selected', String(!showingNotes));
+	notesTab.setAttribute('aria-selected', String(showingNotes));
+	notesPanel.classList.toggle('notes-visible', showingNotes);
+	app.classList.toggle('notes-mode', showingNotes);
+	$('resumePanel').style.display = showingNotes ? 'none' : '';
+	if (persist) vscodeApi.postMessage({ type: 'setActiveTab', activeTab });
 }
 
 // ============================================================
@@ -900,9 +885,11 @@ window.addEventListener('message', (event) => {
 			history = message.history || [];
 			stickyNotes = message.notes || [];
 			trashNotes = message.trash || [];
+			activeTab = message.uiState?.activeTab || 'timer';
 			applyConfig();
-			renderHistory();
 			renderStickyNotes();
+			renderResume();
+			setTab(activeTab, false);
 			updateUI();
 			break;
 
@@ -913,7 +900,6 @@ window.addEventListener('message', (event) => {
 
 		case 'history':
 			history = message.history || [];
-			renderHistory();
 			renderResume();
 			break;
 
@@ -1022,8 +1008,6 @@ function applyConfig() {
 	$('breakDuration').value = config.breakDuration ?? 5;
 	$('roundsPerSession').value = config.roundsPerSession ?? 2;
 
-	$('autoStartBreaks').classList.toggle('active', config.autoStartBreaks !== false);
-	$('autoStartFocus').classList.toggle('active', config.autoStartFocus === true);
 	$('enableSounds').classList.toggle('active', config.enableSounds !== false);
 
 	// Apply saved background
@@ -1034,63 +1018,9 @@ function applyConfig() {
 	});
 }
 
-// ============================================================
-// History Management
-// ============================================================
-function formatDuration(seconds) {
-	const hours = Math.floor(seconds / 3600);
-	const minutes = Math.floor((seconds % 3600) / 60);
-	return (hours > 0 ? `${hours}h ` : '') + `${minutes}m`;
-}
-
-function formatDate(isoString) {
-	const date = new Date(isoString);
-	return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
 function escapeHtml(text) {
 	const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 	return String(text).replace(/[&<>"']/g, char => escapeMap[char]);
-}
-
-function renderHistory() {
-	const container = $('historyContent');
-
-	if (!history.length) {
-		container.innerHTML = '<div class="history-empty">No sessions yet.<br>Complete a session to see it here.</div>';
-		const clearBtn = $('clearHistoryHeaderBtn');
-		if (clearBtn) clearBtn.style.display = 'none';
-		return;
-	}
-
-	let html = '';
-	history.forEach(session => {
-		html += `
-			<div class="session-card">
-				<div class="session-card-head">
-					<span class="session-type-dot ${session.type}"></span>
-					<span class="session-card-title">${escapeHtml(session.title)}</span>
-					<button class="session-del" data-id="${session.id}">&times;</button>
-				</div>
-				<div class="session-meta">
-					<span>${formatDate(session.date)}</span>
-					<span>⏱ ${formatDuration(session.durationSeconds)}</span>
-					<span>${session.type}</span>
-				</div>
-			</div>
-		`;
-	});
-
-	container.innerHTML = html;
-	const clearBtn = $('clearHistoryHeaderBtn');
-	clearBtn.style.display = '';
-
-	// Attach event listeners
-	container.querySelectorAll('.session-del').forEach(btn => {
-		btn.addEventListener('click', () => {
-			vscodeApi.postMessage({ type: 'deleteSession', id: btn.dataset.id });
-		});
-	});
 }
 
 function renderResume() {
@@ -1153,11 +1083,16 @@ function hexToRgb(hex) {
 
 function noteColorRule(hex) {
 	const rgb = hexToRgb(hex);
-	return `background: rgba(${rgb},0.20); border-color: rgba(${rgb},0.38);`;
+	return `background: rgba(${rgb},0.72); border-color: rgba(${rgb},0.9);`;
 }
 
 function autoGrow(textarea) {
-	textarea.style.height = 'auto';
+	const card = textarea.closest('.sticky-note');
+	if (card && card.dataset.sized === 'true') {
+		textarea.style.height = 'auto';
+		return;
+	}
+	textarea.style.height = '0px';
 	textarea.style.height = textarea.scrollHeight + 'px';
 }
 
@@ -1174,17 +1109,16 @@ function renderStickyNotes() {
 
 	let html = '';
 
-	if (stickyNotes.length < MAX_NOTES) {
-		html += '<button class="add-note-btn" id="addNoteBtn">+ Add note</button>';
-	}
-
 	stickyNotes.forEach((note, index) => {
 		const color = note.color || NOTE_PALETTE[index % NOTE_PALETTE.length];
+		const x = note.x ?? (12 + (index % 4) * 23);
+		const y = note.y ?? (16 + Math.floor(index / 4) * 25);
+		const size = `${note.width ? `width:${note.width}px;` : ''}${note.height ? `height:${note.height}px;` : ''}`;
 		const swatches = NOTE_PALETTE.map(c => `
 			<button class="palette-swatch${c === color ? ' active' : ''}" style="background:${c}" data-id="${note.id}" data-color="${c}" title="Change color"></button>
 		`).join('');
 		html += `
-			<div class="sticky-note" data-id="${note.id}" style="${noteColorRule(color)}">
+			<div class="sticky-note" data-id="${note.id}" data-sized="${note.height ? 'true' : 'false'}" style="${noteColorRule(color)}; ${size}left:${x}%; top:${y}%">
 				<div class="sticky-note-toolbar">
 					<div class="sticky-note-color-wrap">
 						<button class="sticky-note-color-btn" style="background:${color}" data-id="${note.id}" title="Change color"></button>
@@ -1242,7 +1176,7 @@ function renderStickyNotes() {
 
 			const card = list.querySelector(`.sticky-note[data-id="${id}"]`);
 			if (card) {
-				card.setAttribute('style', noteColorRule(color));
+				card.setAttribute('style', `${noteColorRule(color)};left:${card.style.left};top:${card.style.top}`);
 				card.querySelector('.sticky-note-color-btn').style.background = color;
 				card.querySelectorAll('.palette-swatch').forEach(sw => {
 					sw.classList.toggle('active', sw.dataset.color === color);
@@ -1254,12 +1188,61 @@ function renderStickyNotes() {
 		});
 	});
 
-	const addBtn = $('addNoteBtn');
-	if (addBtn) {
-		addBtn.addEventListener('click', () => {
-			vscodeApi.postMessage({ type: 'addNote' });
+	attachNoteDrag(list);
+	attachNoteResize(list);
+}
+
+function attachNoteDrag(container) {
+	container.querySelectorAll('.sticky-note').forEach(noteEl => {
+		let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+		noteEl.addEventListener('pointerdown', e => {
+			if (e.target.closest('textarea, button')) return;
+			const rect = container.getBoundingClientRect();
+			const noteRect = noteEl.getBoundingClientRect();
+			startX = e.clientX; startY = e.clientY;
+			startLeft = noteRect.left - rect.left; startTop = noteRect.top - rect.top;
+			noteEl.setPointerCapture(e.pointerId);
+			const move = ev => {
+				const x = Math.max(0, Math.min(rect.width - noteRect.width, startLeft + ev.clientX - startX));
+				const y = Math.max(0, Math.min(rect.height - noteRect.height, startTop + ev.clientY - startY));
+				noteEl.style.left = `${rect.width ? x / rect.width * 100 : 0}%`;
+				noteEl.style.top = `${rect.height ? y / rect.height * 100 : 0}%`;
+			};
+			const up = () => {
+				const note = stickyNotes.find(n => n.id === noteEl.dataset.id);
+				if (note) {
+					// Keep the in-memory model in sync before any action re-renders the notes.
+					note.x = parseFloat(noteEl.style.left);
+					note.y = parseFloat(noteEl.style.top);
+					vscodeApi.postMessage({ type: 'updateNoteLayout', id: note.id, x: note.x, y: note.y });
+				}
+				noteEl.removeEventListener('pointermove', move);
+				noteEl.removeEventListener('pointerup', up);
+			};
+			noteEl.addEventListener('pointermove', move);
+			noteEl.addEventListener('pointerup', up);
 		});
-	}
+	});
+	requestAnimationFrame(() => list.querySelectorAll('.sticky-note-text').forEach(autoGrow));
+}
+
+function attachNoteResize(container) {
+	if (!window.ResizeObserver) return;
+	const observer = new ResizeObserver(entries => {
+		entries.forEach(entry => {
+			const note = stickyNotes.find(n => n.id === entry.target.dataset.id);
+			if (!note || !entry.contentRect.width || !entry.contentRect.height) return;
+			note.width = Math.round(entry.contentRect.width);
+			note.height = Math.round(entry.contentRect.height);
+			vscodeApi.postMessage({
+				type: 'updateNoteLayout', id: note.id,
+				x: note.x ?? (parseFloat(entry.target.style.left) || 0),
+				y: note.y ?? (parseFloat(entry.target.style.top) || 0),
+				width: note.width, height: note.height
+			});
+		});
+	});
+	container.querySelectorAll('.sticky-note').forEach(note => observer.observe(note));
 }
 
 const TRASH_RETENTION_DAYS = 30;

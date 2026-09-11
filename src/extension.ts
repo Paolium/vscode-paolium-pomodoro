@@ -101,8 +101,7 @@ function handleSessionComplete(): void {
 	};
 
 	storage.addSession(record).then(() => {
-		currentPanel?.webview.postMessage({ type: 'history', history: storage.getHistory() });
-		vscode.window.showInformationMessage(`🍅 Session "${record.title}" complete! Saved to history.`);
+		vscode.window.showInformationMessage(`🍅 Session "${record.title}" complete!`);
 	}).catch((err: Error) => {
 		vscode.window.showErrorMessage(`Failed to save session: ${err.message}`);
 	});
@@ -147,6 +146,7 @@ async function openPanel(context: vscode.ExtensionContext): Promise<void> {
 		config: storage.getConfig(),
 		history: storage.getHistory(),
 		notes: storage.getNotes(),
+		uiState: storage.getUiState(),
 		trash
 	});
 }
@@ -169,23 +169,6 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 				vscode.window.showErrorMessage(`Failed to save config: ${err.message}`);
 			});
 			break;
-		case 'getHistory':
-			currentPanel?.webview.postMessage({ type: 'history', history: storage.getHistory() });
-			break;
-		case 'deleteSession':
-			storage.deleteSession(message.id as string).then(() => {
-				currentPanel?.webview.postMessage({ type: 'history', history: storage.getHistory() });
-			}).catch((err: Error) => {
-				vscode.window.showErrorMessage(`Failed to delete session: ${err.message}`);
-			});
-			break;
-		case 'clearHistory':
-			storage.clearHistory().then(() => {
-				currentPanel?.webview.postMessage({ type: 'history', history: storage.getHistory() });
-			}).catch((err: Error) => {
-				vscode.window.showErrorMessage(`Failed to clear history: ${err.message}`);
-			});
-			break;
 		case 'addNote':
 			storage.addNote().then((notes) => {
 				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash: storage.getTrash() });
@@ -201,6 +184,16 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 		case 'updateNoteColor':
 			storage.updateNoteColor(message.id as string, message.color as string).catch((err: Error) => {
 				vscode.window.showErrorMessage(`Failed to save note color: ${err.message}`);
+			});
+			break;
+		case 'updateNoteLayout':
+			storage.updateNoteLayout(message.id as string, message.x as number, message.y as number, message.width as number | undefined, message.height as number | undefined).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to save note position: ${err.message}`);
+			});
+			break;
+		case 'setActiveTab':
+			storage.setActiveTab(message.activeTab as 'timer' | 'notes').catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to save active tab: ${err.message}`);
 			});
 			break;
 		case 'deleteNote':
@@ -241,6 +234,5 @@ async function getHtmlContent(context: vscode.ExtensionContext): Promise<string>
 // ==================== Lifecycle ====================
 
 export function deactivate(): void {
-	currentPanel?.dispose();
 	timer?.dispose();
 }

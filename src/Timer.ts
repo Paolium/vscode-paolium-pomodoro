@@ -32,8 +32,6 @@ interface TimerConfig {
 	focusDuration: number;
 	breakDuration: number;
 	roundsPerSession: number;
-	autoStartBreaks: boolean;
-	autoStartFocus: boolean;
 }
 
 /**
@@ -207,9 +205,7 @@ export class Timer {
 		this.status = 'idle';
 		this.emitPhaseChange();
 
-		if (this.config.autoStartBreaks) {
-			this.autoStartTimeoutId = setTimeout(() => this.start(), 1000);
-		}
+		this.autoStartTimeoutId = setTimeout(() => this.start(), 1000);
 	}
 
 	private handleBreakComplete(): void {
@@ -230,9 +226,7 @@ export class Timer {
 		this.status = 'idle';
 		this.emitPhaseChange();
 
-		if (this.config.autoStartFocus) {
-			this.autoStartTimeoutId = setTimeout(() => this.start(), 1000);
-		}
+		this.autoStartTimeoutId = setTimeout(() => this.start(), 1000);
 	}
 
 	private completeSession(): void {

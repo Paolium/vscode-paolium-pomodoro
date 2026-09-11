@@ -7,8 +7,6 @@ export interface PomodoroConfig {
 	focusDuration: number;
 	breakDuration: number;
 	roundsPerSession: number;
-	autoStartBreaks: boolean;
-	autoStartFocus: boolean;
 	backgroundImage: string;
 	enableSounds: boolean;
 }
@@ -31,6 +29,10 @@ export interface StickyNote {
 	id: string;
 	text: string;
 	color?: string;
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
 }
 
 /**
@@ -44,8 +46,6 @@ const DEFAULT_CONFIG: PomodoroConfig = {
 	focusDuration: 25,
 	breakDuration: 5,
 	roundsPerSession: 2,
-	autoStartBreaks: true,
-	autoStartFocus: false,
 	backgroundImage: 'transparent',
 	enableSounds: true
 };
@@ -57,12 +57,18 @@ const TRASH_KEY = 'pomodoroStickyNotesTrash';
 const MAX_NOTES = 20;
 const MAX_TRASH = 50;
 const TRASH_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+const UI_STATE_KEY = 'pomodoroUiState';
+
+export interface PomodoroUiState {
+	activeTab: 'timer' | 'notes';
+}
 
 /**
  * Manages extension persistence: configuration and session history.
  */
 export class Storage {
 	private context: vscode.ExtensionContext;
+	private noteLayoutQueue: Promise<void> = Promise.resolve();
 
 	// Session metadata (simplified - public access)
 	public sessionTitle: string = '';
@@ -81,8 +87,6 @@ export class Storage {
 			focusDuration: config.get('focusDuration', DEFAULT_CONFIG.focusDuration),
 			breakDuration: config.get('breakDuration', DEFAULT_CONFIG.breakDuration),
 			roundsPerSession: config.get('roundsPerSession', DEFAULT_CONFIG.roundsPerSession),
-			autoStartBreaks: config.get('autoStartBreaks', DEFAULT_CONFIG.autoStartBreaks),
-			autoStartFocus: config.get('autoStartFocus', DEFAULT_CONFIG.autoStartFocus),
 			backgroundImage: config.get('backgroundImage', DEFAULT_CONFIG.backgroundImage),
 			enableSounds: config.get('enableSounds', DEFAULT_CONFIG.enableSounds)
 		};
@@ -143,7 +147,7 @@ export class Storage {
 	async addNote(): Promise<StickyNote[]> {
 		const notes = this.getNotes();
 		if (notes.length >= MAX_NOTES) return notes;
-		notes.push({ id: Date.now().toString(), text: '' });
+		notes.push({ id: Date.now().toString(), text: '', x: 42, y: 42 });
 		await this.context.globalState.update(NOTES_KEY, notes);
 		return notes;
 	}
@@ -168,6 +172,30 @@ export class Storage {
 		if (!note) return;
 		note.color = color;
 		await this.context.globalState.update(NOTES_KEY, notes);
+	}
+
+	/** Persists a note's canvas position and optional size. */
+	async updateNoteLayout(id: string, x: number, y: number, width?: number, height?: number): Promise<void> {
+		// Serialize layout writes so fast drag/pin actions cannot overwrite each other.
+		this.noteLayoutQueue = this.noteLayoutQueue.then(async () => {
+			const notes = this.getNotes();
+			const note = notes.find(n => n.id === id);
+			if (!note) return;
+			note.x = Math.max(0, Math.min(100, x));
+			note.y = Math.max(0, Math.min(100, y));
+			if (width !== undefined) note.width = Math.max(160, Math.min(600, width));
+			if (height !== undefined) note.height = Math.max(112, Math.min(600, height));
+			await this.context.globalState.update(NOTES_KEY, notes);
+		});
+		await this.noteLayoutQueue;
+	}
+
+	getUiState(): PomodoroUiState {
+		return this.context.globalState.get<PomodoroUiState>(UI_STATE_KEY, { activeTab: 'timer' });
+	}
+
+	async setActiveTab(activeTab: 'timer' | 'notes'): Promise<void> {
+		await this.context.globalState.update(UI_STATE_KEY, { activeTab });
 	}
 
 	/**
@@ -213,7 +241,7 @@ export class Storage {
 		await this.context.globalState.update(TRASH_KEY, trash);
 
 		const notes = this.getNotes();
-		notes.push({ id: restored.id, text: restored.text, color: restored.color });
+		notes.push({ id: restored.id, text: restored.text, color: restored.color, x: restored.x, y: restored.y, width: restored.width, height: restored.height });
 		await this.context.globalState.update(NOTES_KEY, notes);
 
 		return { notes, trash };

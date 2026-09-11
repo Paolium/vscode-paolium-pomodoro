@@ -3,7 +3,7 @@
   "displayName": "Paolium Pomodoro",
   "publisher": "Paolium",
   "author": "Paolium",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "A beautiful and an elegant Pomodoro timer",
   "license": "MIT",
   "icon": "paolium-icon.png",
@@ -69,16 +69,6 @@
           "minimum": 1,
           "maximum": 12,
           "description": "Number of rounds per session (1 round = 1 Focus + 1 Break)"
-        },
-        "pomodoro.autoStartBreaks": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically start break timer after focus"
-        },
-        "pomodoro.autoStartFocus": {
-          "type": "boolean",
-          "default": false,
-          "description": "Automatically start focus timer after break"
         },
         "pomodoro.backgroundImage": {
           "type": "string",

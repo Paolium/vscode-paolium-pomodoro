@@ -12,6 +12,8 @@ A beautiful and an elegant Pomodoro timer.
 - Background themes
 - Sound alerts on phase transitions
 - Status bar integration
+- Freeform sticky notes canvas, independent of any session — drag, resize, and color each note
+- Notes trash bin with 30-day retention and restore
 
 ## Commands
 
@@ -27,8 +29,6 @@ Press `CTRL + SHIFT + P` to open the Command Palette and search:
 | `pomodoro.focusDuration` | 25 | Focus duration in minutes |
 | `pomodoro.breakDuration` | 5 | Break duration in minutes |
 | `pomodoro.roundsPerSession` | 2 | Number of rounds per session |
-| `pomodoro.autoStartBreaks` | true | Auto-start break after focus |
-| `pomodoro.autoStartFocus` | false | Auto-start focus after break |
 | `pomodoro.backgroundImage` | aurora | Background theme |
 | `pomodoro.enableSounds` | true | Enable sound alerts |
 
@@ -42,9 +42,6 @@ Press `CTRL + SHIFT + P` to open the Command Palette and search:
 ![Pomodoro](https://github.com/Paolium/vscode-paolium-pomodoro/blob/main/media/pomodoro-3.png?raw=true)
 
 ![Pomodoro](https://github.com/Paolium/vscode-paolium-pomodoro/blob/main/media/pomodoro-4.png?raw=true)
-
-### Session History
-![Pomodoro](https://github.com/Paolium/vscode-paolium-pomodoro/blob/main/media/pomodoro-5.png?raw=true)
 
 ### Time By Day
 ![Pomodoro](https://github.com/Paolium/vscode-paolium-pomodoro/blob/main/media/pomodoro-6.png?raw=true)
