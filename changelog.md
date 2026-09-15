@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.1.0
+### Fixed
+- Notes no longer lose their size when reopening the panel or adding a new note (the previous resize logic used to shrink every note a little more each time)
+- A note's color no longer changes when the note is reordered
+### Changed
+- Notes now use a fixed size and auto-arrange into a responsive grid (like rows/columns) instead of free positioning, so they never overlap when the window is resized
+- Notes can be reordered by dragging one card over another; displaced cards slide into place with a lightweight animation
+### Removed
+- Manual free-form drag/resize positioning for notes, replaced by the auto-arranging grid above
+
 ## v3.0.0
 ### Added
 - Timer / Notes tab switcher in the header, replacing the separate history, time-by-day, and notes-toggle icons

@@ -29,10 +29,6 @@ export interface StickyNote {
 	id: string;
 	text: string;
 	color?: string;
-	x?: number;
-	y?: number;
-	width?: number;
-	height?: number;
 }
 
 /**
@@ -49,6 +45,9 @@ const DEFAULT_CONFIG: PomodoroConfig = {
 	backgroundImage: 'transparent',
 	enableSounds: true
 };
+
+// Kept in sync with NOTE_PALETTE in src/panel.html.
+const NOTE_PALETTE = ['#F7C359', '#FA4F67', '#0D71FD', '#7CB518', '#7A5AF8', '#007A5E'];
 
 const HISTORY_KEY = 'pomodoroSessionHistory';
 const MAX_HISTORY = 200;
@@ -68,7 +67,6 @@ export interface PomodoroUiState {
  */
 export class Storage {
 	private context: vscode.ExtensionContext;
-	private noteLayoutQueue: Promise<void> = Promise.resolve();
 
 	// Session metadata (simplified - public access)
 	public sessionTitle: string = '';
@@ -138,7 +136,20 @@ export class Storage {
 	 * Returns all sticky notes, persisted independently of any session
 	 */
 	getNotes(): StickyNote[] {
-		return this.context.globalState.get<StickyNote[]>(NOTES_KEY, []);
+		const notes = this.context.globalState.get<StickyNote[]>(NOTES_KEY, []);
+		// Backfill a fixed color for notes saved before colors were assigned at creation time,
+		// so a note's color no longer depends on its position in the list (drag reordering used to change it).
+		let migrated = false;
+		notes.forEach((note, index) => {
+			if (!note.color) {
+				note.color = NOTE_PALETTE[index % NOTE_PALETTE.length];
+				migrated = true;
+			}
+		});
+		if (migrated) {
+			this.context.globalState.update(NOTES_KEY, notes);
+		}
+		return notes;
 	}
 
 	/**
@@ -147,7 +158,8 @@ export class Storage {
 	async addNote(): Promise<StickyNote[]> {
 		const notes = this.getNotes();
 		if (notes.length >= MAX_NOTES) return notes;
-		notes.push({ id: Date.now().toString(), text: '', x: 42, y: 42 });
+		const color = NOTE_PALETTE[notes.length % NOTE_PALETTE.length];
+		notes.push({ id: Date.now().toString(), text: '', color });
 		await this.context.globalState.update(NOTES_KEY, notes);
 		return notes;
 	}
@@ -174,20 +186,18 @@ export class Storage {
 		await this.context.globalState.update(NOTES_KEY, notes);
 	}
 
-	/** Persists a note's canvas position and optional size. */
-	async updateNoteLayout(id: string, x: number, y: number, width?: number, height?: number): Promise<void> {
-		// Serialize layout writes so fast drag/pin actions cannot overwrite each other.
-		this.noteLayoutQueue = this.noteLayoutQueue.then(async () => {
-			const notes = this.getNotes();
-			const note = notes.find(n => n.id === id);
-			if (!note) return;
-			note.x = Math.max(0, Math.min(100, x));
-			note.y = Math.max(0, Math.min(100, y));
-			if (width !== undefined) note.width = Math.max(160, Math.min(600, width));
-			if (height !== undefined) note.height = Math.max(112, Math.min(600, height));
-			await this.context.globalState.update(NOTES_KEY, notes);
-		});
-		await this.noteLayoutQueue;
+	/** Reorders notes to match the given ID sequence (from a drag-and-drop reorder). */
+	async reorderNotes(ids: string[]): Promise<StickyNote[]> {
+		const notes = this.getNotes();
+		const byId = new Map(notes.map(n => [n.id, n]));
+		const ordered: StickyNote[] = [];
+		for (const id of ids) {
+			const note = byId.get(id);
+			if (note) { ordered.push(note); byId.delete(id); }
+		}
+		ordered.push(...byId.values());
+		await this.context.globalState.update(NOTES_KEY, ordered);
+		return ordered;
 	}
 
 	getUiState(): PomodoroUiState {
@@ -241,7 +251,7 @@ export class Storage {
 		await this.context.globalState.update(TRASH_KEY, trash);
 
 		const notes = this.getNotes();
-		notes.push({ id: restored.id, text: restored.text, color: restored.color, x: restored.x, y: restored.y, width: restored.width, height: restored.height });
+		notes.push({ id: restored.id, text: restored.text, color: restored.color });
 		await this.context.globalState.update(NOTES_KEY, notes);
 
 		return { notes, trash };

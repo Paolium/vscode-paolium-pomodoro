@@ -186,9 +186,11 @@ function handleMessage(message: { type: string; [key: string]: unknown }): void 
 				vscode.window.showErrorMessage(`Failed to save note color: ${err.message}`);
 			});
 			break;
-		case 'updateNoteLayout':
-			storage.updateNoteLayout(message.id as string, message.x as number, message.y as number, message.width as number | undefined, message.height as number | undefined).catch((err: Error) => {
-				vscode.window.showErrorMessage(`Failed to save note position: ${err.message}`);
+		case 'reorderNotes':
+			storage.reorderNotes(message.ids as string[]).then((notes) => {
+				currentPanel?.webview.postMessage({ type: 'notesState', notes, trash: storage.getTrash() });
+			}).catch((err: Error) => {
+				vscode.window.showErrorMessage(`Failed to reorder notes: ${err.message}`);
 			});
 			break;
 		case 'setActiveTab':
