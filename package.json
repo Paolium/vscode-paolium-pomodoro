@@ -3,19 +3,23 @@
   "displayName": "Paolium Pomodoro",
   "publisher": "Paolium",
   "author": "Paolium",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "A beautiful and an elegant Pomodoro timer",
   "license": "MIT",
   "icon": "paolium-icon.png",
   "galleryBanner": {
-    "color": "#007A5E",
+    "color": "#D69D00",
     "theme": "dark"
   },
   "engines": {
     "vscode": "^1.90.0"
   },
-  "extensionKind": ["ui"],
-  "categories": [ "Other" ],
+  "extensionKind": [
+    "ui"
+  ],
+  "categories": [
+    "Other"
+  ],
   "keywords": [
     "pomodoro",
     "timer",

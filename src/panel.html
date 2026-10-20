@@ -21,16 +21,16 @@ body {
  	background: transparent;
  	transition: color 0.3s ease;
  	image-rendering: -webkit-optimize-contrast;
---accent: #007A5E;
-  	--accent-2: #00CC9C;
-  	--accent-rgb: 0,122,94;
+--accent: #D69D00;
+  	--accent-2: #F0B429;
+  	--accent-rgb: 214,157,0;
   }
- .app.theme-paolium,  body.theme-paolium  { --accent:#007A5E; --accent-2:#00CC9C; --accent-rgb:0,122,94; }
+ .app.theme-paolium,  body.theme-paolium  { --accent:#D69D00; --accent-2:#F0B429; --accent-rgb:214,157,0; }
  .app.theme-sapphire, body.theme-sapphire { --accent:#0D71FD; --accent-2:#3D8FFF; --accent-rgb:13,113,253; }
  .app.theme-ruby,     body.theme-ruby     { --accent:#FA4F67; --accent-2:#FF6B85; --accent-rgb:250,79,103; }
- .app.theme-light,    body.theme-light    { --accent:#007A5E; --accent-2:#00CC9C; --accent-rgb:0,122,94; }
- .app.theme-graphite, body.theme-graphite { --accent:#F7C359; --accent-2:#FFD980; --accent-rgb:247,195,89; }
- .app.theme-carbon,   body.theme-carbon   { --accent:#7CB518; --accent-2:#9ED13A; --accent-rgb:124,181,24; }
+ .app.theme-light,    body.theme-light    { --accent:#D69D00; --accent-2:#F0B429; --accent-rgb:214,157,0; }
+ .app.theme-graphite, body.theme-graphite { --accent:#4D4D52; --accent-2:#6E6E75; --accent-rgb:77,77,82; }
+ .app.theme-carbon,   body.theme-carbon   { --accent:#95D700; --accent-2:#B4F02E; --accent-rgb:149,215,0; }
  .app.theme-amethyst, body.theme-amethyst { --accent:#7A5AF8; --accent-2:#9A7AFF; --accent-rgb:122,90,248; }
 /* Dark theme adjustments */
 .app.dark { color: #f5f5f7; }
@@ -60,12 +60,12 @@ body {
    Background Themes (from vscode-paolium-theme)
 
    transparent - No background (uses VSCODE editor background)
-   paolium     - Dark green (#0d1f17) with brand (#007A5E)
+   paolium     - Near black (#141414) with brand Paolium (#D69D00, a.k.a. "Goldenron")
    sapphire    - Deep blue (#061a36) with trust (#0D71FD)
    ruby        - Dark red (#1c0e15) with passion (#FA4F67)
    light       - Off-white (#f9f9f9) with purple (#7A5AF8)
-   graphite    - Dark gray (#1D1D21) with warmth (#F7C359)
-   carbon      - Near black (#1A1B1E) with energy (#7CB518)
+   graphite    - Pure black (#000000) with graphite gray (#4D4D52)
+   carbon      - Near black (#0a0a0a) with energy (#95D700)
    amethyst    - Near black (#0D1117) with intuition (#7A5AF8)
    ============================================================ */
 
@@ -196,7 +196,7 @@ body {
 
 .app.dark .session-info.phase-break,
 .session-info.phase-break,
-.session-info.phase-break * { color: #007A5E; }
+.session-info.phase-break * { color: #D69D00; }
 
 .controls { display: flex; gap: 16px; justify-content: center; align-items: center; }
 .btn { border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s ease; }
@@ -242,22 +242,22 @@ body {
 
 .bg-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
 .bg-option { aspect-ratio: 1; border-radius: 14px; cursor: pointer; border: 3px solid transparent; transition: all 0.2s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
-.bg-option.active { border-color: #007A5E; transform: scale(1.08); }
+.bg-option.active { border-color: #D69D00; transform: scale(1.08); }
 .bg-option:hover { transform: scale(1.08); }
 .bg-transparent { background: rgba(128,128,128,0.15); border: 2px dashed rgba(128,128,128,0.4); }
 .bg-transparent::after { content: 'VS'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: rgba(128,128,128,0.5); }
-.bg-paolium { background: #0d1f17; }
-.bg-paolium::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007A5E; box-shadow: 0 0 6px #007A5E; }
+.bg-paolium { background: #141414; }
+.bg-paolium::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #D69D00; box-shadow: 0 0 6px #D69D00; }
 .bg-sapphire { background: #061a36; }
 .bg-sapphire::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #0D71FD; box-shadow: 0 0 6px #0D71FD; }
 .bg-ruby { background: #1c0e15; }
 .bg-ruby::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #FA4F67; box-shadow: 0 0 6px #FA4F67; }
 .bg-light { background: #f9f9f9; }
-.bg-light::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007A5E; box-shadow: 0 0 6px #007A5E; }
-.bg-graphite { background: #241c10; }
-.bg-graphite::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #F7C359; box-shadow: 0 0 6px #F7C359; }
+.bg-light::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #D69D00; box-shadow: 0 0 6px #D69D00; }
+.bg-graphite { background: #000000; }
+.bg-graphite::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #4D4D52; box-shadow: 0 0 6px #4D4D52; }
 .bg-carbon { background: #0a0a0a; }
-.bg-carbon::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #7CB518; box-shadow: 0 0 6px #7CB518; }
+.bg-carbon::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #95D700; box-shadow: 0 0 6px #95D700; }
 .bg-amethyst { background: #180f2e; }
 .bg-amethyst::after { content: ''; position: absolute; right: 4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #7A5AF8; box-shadow: 0 0 6px #7A5AF8; }
 
@@ -276,7 +276,7 @@ body {
 
 .resume-day { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; margin-bottom: 8px; }
 .resume-day-label { font-size: 14px; font-weight: 600; }
-.resume-day-time { font-size: 14px; font-weight: 700; color: #9ED13A; }
+.resume-day-time { font-size: 14px; font-weight: 700; color: #D69D00; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 50; }
 .overlay.visible { opacity: 1; pointer-events: all; }
@@ -429,8 +429,8 @@ body:has(.app.dark) .notes-empty { color: rgba(255,255,255,0.35); }
 .trash-note-restore, .trash-note-purge {
 	font-family: inherit; font-size: 11px; font-weight: 600; border: none; border-radius: 7px; padding: 5px 9px; cursor: pointer; transition: all 0.15s ease;
 }
-.trash-note-restore { background: rgba(var(--accent-rgb, 0,122,94),0.14); color: var(--accent, #007A5E); }
-.trash-note-restore:hover { background: rgba(var(--accent-rgb, 0,122,94),0.24); }
+.trash-note-restore { background: rgba(var(--accent-rgb, 214,157,0),0.14); color: var(--accent, #D69D00); }
+.trash-note-restore:hover { background: rgba(var(--accent-rgb, 214,157,0),0.24); }
 .trash-note-purge { background: rgba(255,94,114,0.12); color: #ff5e72; }
 .trash-note-purge:hover { background: rgba(255,94,114,0.22); }
 
@@ -642,11 +642,11 @@ const lightBackgrounds = ['light'];
    // ============================================================
    const backgroundGradients = {
    	transparent: '',
-   	paolium:  '#0d1f17',
+   	paolium:  '#141414',
    	sapphire: '#061a36',
    	ruby:     '#1c0e15',
    	light:    '#f9f9f9',
-   	graphite: '#241c10',
+   	graphite: '#000000',
    	carbon:   '#0a0a0a',
    	amethyst: '#180f2e'
    };

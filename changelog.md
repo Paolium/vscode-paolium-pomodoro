@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.2.0
+### Changed
+- New Paolium brand color (`#D69D00`, a gold shade also known as Goldenron) for the Paolium and Light themes, the break phase, and the selected background highlight
+- Paolium theme now uses a near-black background (`#141414`) instead of dark green
+- Graphite theme now uses a pure black background with a graphite gray (`#4D4D52`) accent
+- Carbon theme accent updated to a brighter green (`#95D700`)
+- Time by Day totals are now shown in the Paolium color instead of green
+
 ## v3.1.0
 ### Fixed
 - Notes no longer lose their size when reopening the panel or adding a new note (the previous resize logic used to shrink every note a little more each time)
